@@ -1,14 +1,13 @@
 from flask import Flask
 from config import Config
-
+from database.db import init_db
 
 def create_app():
     app = Flask(__name__)
-
     app.config.from_object(Config)
+    init_db()
 
     register_routes(app)
-
     return app
 
 def register_routes(app):

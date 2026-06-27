@@ -1,4 +1,4 @@
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
@@ -6,7 +6,7 @@ CREATE TABLE users (
     avatar TEXT DEFAULT NULL
 );
 
-CREATE TABLE posts (
+CREATE TABLE IF NOT EXISTS posts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     author_id INTEGER NOT NULL,
     title TEXT NOT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE posts (
     FOREIGN KEY (author_id) REFERENCES users(id)
 );
 
-CREATE TABLE comments (
+CREATE TABLE IF NOT EXISTS comments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     post_id INTEGER NOT NULL,
     author_id INTEGER NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE comments (
     FOREIGN KEY (author_id) REFERENCES users(id)
 );
 
-CREATE TABLE replies (
+CREATE TABLE IF NOT EXISTS replies (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     comment_id INTEGER NOT NULL,
     author_id INTEGER NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE replies (
     FOREIGN KEY (parent_reply_id) REFERENCES replies(id)
 );
 
-CREATE TABLE post_likes (
+CREATE TABLE IF NOT EXISTS post_likes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     post_id INTEGER NOT NULL,
@@ -48,7 +48,7 @@ CREATE TABLE post_likes (
     UNIQUE(user_id, post_id)
 );
 
-CREATE TABLE comment_likes (
+CREATE TABLE IF NOT EXISTS comment_likes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     comment_id INTEGER NOT NULL,
