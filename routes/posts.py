@@ -1,7 +1,7 @@
 from flask import Flask, Blueprint, current_app, render_template, request, redirect, url_for, session, abort
 from models.post import get_posts, get_post, add_post, update_post, delete_post, get_username, get_comments_for_post, get_username, get_posts_with_authors
 
-from utils.permissions import can_edit_post, can_edit_comment, can_delete_comment, can_hide_comment, can_edit_reply, can_delete_reply
+from utils.permissions import can_edit_post, can_delete_post, can_edit_comment, can_delete_comment, can_hide_comment, can_edit_reply, can_delete_reply
 
 posts_bp = Blueprint('posts', __name__)
 
@@ -18,7 +18,7 @@ def index():
         current_username = get_username(user["id"])
     posts = get_posts_with_authors(user)
 
-    return render_template("index.html", posts=posts, current_username=current_username)
+    return render_template("posts/index.html", posts=posts, current_username=current_username)
 
 
 @posts_bp.route("/post/<int:post_id>")
@@ -37,7 +37,7 @@ def show_post(post_id):
     username = get_username(post["author_id"])
 
     return render_template(
-        "post.html", 
+        "posts/view.html", 
         post=post, comments=comments, user=user, 
         username=username, can_edit_post=can_edit_post, 
         can_edit_comment=can_edit_comment, 
@@ -57,11 +57,11 @@ def create_post():
         content = request.form.get("content")
         is_public = int(request.form.get('is_public', 1))
         if not title or not content:
-            return render_template("edit_post.html", post=post, error="Title and content are required")
+            return render_template("posts/index.html", error="Title and content are required")
         add_post(user_id, title, content, is_public)
         return redirect(url_for("posts.index"))
     
-    return render_template("create_post.html")
+    return render_template("posts/create.html")
 
 
 @posts_bp.route("/post/edit/<int:post_id>", methods=["GET","POST"])
@@ -81,8 +81,21 @@ def edit_post(post_id):
         is_public = int(request.form.get('is_public', 1))
         post_id = post["id"]
         if not title or not content:
-            return render_template("edit_post.html", post=post, error="Title and content are required")
+            return render_template("posts/edit.html", post=post, error="Title and content are required")
         update_post(post_id, title, content, is_public)
         return redirect(url_for("posts.show_post", post_id=post_id))
     
-    return render_template("edit_post.html", post=post)
+    return render_template("posts/edit.html", post=post)
+
+@posts_bp.route("/post/delete/<int:post_id>")
+def del_post(post_id):
+    if not session.get("user_id"):
+        return redirect(url_for("auth.login"))
+    user = {"id": session["user_id"], "role": session["role"]}
+    post = get_post(post_id)
+    if post is None:
+        abort(404)
+    if not can_delete_post(user, post):
+        abort(403)
+    delete_post(post_id)
+    return redirect(url_for("posts.index"))

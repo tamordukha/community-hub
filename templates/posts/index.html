@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Blogs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Blogs</h1>
+{% if posts %}
+    {% for post in posts %}
+        <div class="post-card">
+            <div class="post-main-info">
+                <div class="post-header">
+                    <img 
+                    src="{{ url_for('static', filename='uploads/avatars/' + (post.author_avatar if post.author_avatar else 'default.png')) }}"
+                    alt="avatar"
+                    class="avatar"
+                    >
+                </div>
+
+                <div class="post-title-block">
+                    <a href="{{ url_for('posts.show_post', post_id=post.id) }}" class="post-title"> 
+                        {{ post.title }}
+                    </a>
+
+                    <a class="post-author">
+                        {{ post.author_username }}
+                    </a>
+                </div>
+            </div>
+
+            <div class="post-content">
+                {{ post.content }}
+            </div>
+            {% if post.content|length >=300 %}
+                <a href="{{ url_for('posts.show_post', post_id=post.id) }}" class="read-more">Read more...</a>
+            {% endif %}
+            <div class="post-date">
+                {{ post.created_at }}
+            </div>
+
+            <div class="post_footer">
+                <span class="likes">
+                    ❤️ {{ post.like_count if post.like_count else 0 }}
+                </span>
+                <a href="{{ url_for('posts.show_post', post_id=post.id) }}" class="comment-link">
+                    💬 {{ post.comment_count if post.comment_count else 0 }}
+                </a>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>No posts yet.</p>
+{% endif %}
+{% endblock %}
+
+
+</body>
+</html>

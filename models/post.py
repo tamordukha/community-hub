@@ -104,7 +104,7 @@ def get_posts_with_authors(user=None):
 
     cursor.execute(
         """
-        SELECT p.*, u.username AS author_username
+        SELECT p.*, u.username AS author_username, u.avatar AS author_avatar
         FROM posts p
         JOIN users u ON u.id = p.author_id
         ORDER BY p.created_at DESC
