@@ -1,5 +1,5 @@
 from flask import Flask, Blueprint, current_app, render_template, request, redirect, url_for, session, abort
-from models.post import get_posts, get_post, add_post, update_post, delete_post, get_username, get_comments_for_post, get_username, get_posts_with_authors
+from models.post import get_posts, get_post, add_post, update_post, delete_post, get_username, get_comments_for_post, get_username, get_posts_with_authors, get_post_with_author
 
 from utils.permissions import can_edit_post, can_delete_post, can_edit_comment, can_delete_comment, can_hide_comment, can_edit_reply, can_delete_reply
 
@@ -30,16 +30,15 @@ def show_post(post_id):
             "id": session.get("user_id"),
             "role": session.get("role")
         }
-    post = get_post(post_id)
+    post = get_post_with_author(post_id)
     if post is None:
         abort(404)
     comments = get_comments_for_post(user, post_id)
-    username = get_username(post["author_id"])
 
     return render_template(
         "posts/view.html", 
-        post=post, comments=comments, user=user, 
-        username=username, can_edit_post=can_edit_post, 
+        post=post, comments=comments, user=user,
+        can_edit_post=can_edit_post, 
         can_edit_comment=can_edit_comment, 
         can_delete_comment=can_delete_comment, 
         can_hide_comment=can_hide_comment

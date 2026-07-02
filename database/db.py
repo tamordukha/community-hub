@@ -19,3 +19,4 @@ def init_db():
     conn.executescript(schema)
     conn.commit()
     conn.close()
+

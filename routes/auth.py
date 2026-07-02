@@ -42,6 +42,7 @@ def login():
             session["user_id"] = user["id"]
             session["username"] = user["username"]
             session["role"] = user["role"]
+            session["avatar"] = user["avatar"]
             return redirect(url_for("posts.index"))
 
         return render_template("auth/login.html", error="Incorrect username or password")

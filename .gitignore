@@ -5,3 +5,8 @@
 __pycache__/
 *.pyc
 *.db
+
+# Пользовательские аватарки (кроме дефолтной и gitkeep)
+static/uploads/avatars/*
+!static/uploads/avatars/default.png
+!static/uploads/avatars/.gitkeep

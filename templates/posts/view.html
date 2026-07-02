@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ post["title"] }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="post-container">
+    <div class="post-card">
+        <div class="post-main-info">
+            <div class="post-header">
+                <img 
+                src="{{ url_for('static', filename='uploads/avatars/' + (post.author_avatar if post.author_avatar else 'default.png')) }}"
+                alt="avatar"
+                class="avatar"
+                >
+            </div>
+
+            <div class="post-title-block">
+                <span class="post-title"> 
+                    {{ post.title }}
+                </span>
+
+                <span class="post-author">
+                    {{ post.author_username }}
+                </span>
+            </div>
+        </div>
+
+        <div class="post-content">
+            {{ post.content }}
+        </div>
+        {% if post.content|length >=300 %}
+            <a href="{{ url_for('posts.show_post', post_id=post.id) }}" class="read-more">Read more...</a>
+        {% endif %}
+        <div class="post-date">
+            {{ post.created_at }}
+        </div>
+
+        <div class="post_footer">
+            <span class="likes">
+                ❤️ {{ post.like_count if post.like_count else 0 }}
+            </span>
+            <a href="{{ url_for('posts.show_post', post_id=post.id) }}" class="comment-link">
+                💬 {{ post.comment_count if post.comment_count else 0 }}
+            </a>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
+</body>
+</html>

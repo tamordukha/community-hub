@@ -58,7 +58,7 @@ label {
 /* Отступ сверху, чтобы контент не уходил под шапку */
 main {
     margin-top: 60px;
-    padding-bottom: 60px; /* место для нижней панели */
+    padding-bottom: 60px;
     padding-left: 15px;
     padding-right: 15px;
 }
@@ -93,12 +93,14 @@ main {
 }
 
 /* === КАРТОЧКА ПОСТА === */
+
 .post-card {
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 15px;
     margin-bottom: 15px;
+
 }
 
 .post-main-info {
@@ -147,21 +149,6 @@ main {
     text-decoration: underline;
 }
 
-/* Кнопки изменить/удалить */
-.post-actions {
-    display: flex;
-    gap: 5px;
-    flex-shrink: 0;
-}
-
-.icon-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    padding: 0;
-}
-
 /* Контент */
 .post-content {
     max-height: 4.5em;
@@ -198,6 +185,50 @@ main {
     color: #555;
 }
 
+
+/* =====СТРАНИЦА 1 ПОСТА===== */
+
+.post-container .avatar {
+    width: 60px;
+    height: 60px;
+}
+
+.post-container .post-title {
+    font-size: 24px;
+}
+
+
+.post-container .post-title {
+    font-size: 24px;
+}
+
+
+.post-container .post-author {
+    font-size: 19px;
+}
+
+/* Контент */
+
+.post-container .post-content {
+    font-size: 18px;       
+    line-height: 1.6;
+}
+
+.post-container .read-more {
+    font-size: 19px;
+}
+
+/* Дата */
+.post-container .post-date {
+    font-size: 15px;
+}
+
+/* Нижняя строка: лайки и комментарии */
+.post-container .post-footer {
+    font-size: 21px;
+}
+
+
 /* === СЕТКА И РАСКЛАДКА === */
 .container {
     max-width: 500px;
@@ -205,6 +236,18 @@ main {
     padding: 0 20px;
 }
 
+.feed-container {
+    max-width: 650px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+.post-container{
+    max-width: 800px;
+    margin: 40px auto;
+    margin-top: 75px;
+    padding: 0 20px;
+}
 
 /* === КОМПОНЕНТЫ === */
 .hyperlink {
@@ -214,6 +257,15 @@ main {
 .hyperlink:hover {
     color:#0058b6
 }
+
+/* Раздел: Компоненты -> Лента блогов */
+.feed-title {
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 25px;
+    font-size: 3rem;
+}
+
 
 /* === ФОРМЫ === */
 form {

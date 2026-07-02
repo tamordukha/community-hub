@@ -118,3 +118,21 @@ def get_posts_with_authors(user=None):
     visible_posts = [p for p in posts if can_view_post(user, p)]
 
     return visible_posts
+
+def get_post_with_author(post_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT p.*, u.username AS author_username, u.avatar AS author_avatar
+        FROM posts p
+        JOIN users u ON u.id = p.author_id
+        WHERE p.id = ?
+        """,
+        (post_id,)
+    )
+    post = cursor.fetchone()
+    conn.close()
+
+    return dict(post) if post else None
