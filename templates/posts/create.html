@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create post</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+    <h1>Create a post</h1>
+
+    <form method="POST">
+        <input type="text" name="title" id="title" placeholder="Название поста..." required>
+
+        <textarea class="post-create-content" name="content" id="content" rows="7" placeholder="Расскажите свою историю..."></textarea>
+
+        <div class="visibility-toggle">
+            <!-- Скрытое поле, которое Flask автоматически прочитает при отправке формы -->
+            <input type="hidden" name="is_public" id="visibility-input" value="1">
+            
+            <!-- Две кнопки-переключатели -->
+            <button type="button" class="toggle-btn active" data-value="1">Публичный</button>
+            <button type="button" class="toggle-btn" data-value="0">Приватный</button>
+        </div>
+
+        <div class="post-editor-form-actions">
+            <button type="submit" class="btn-post-editor">Create</button>
+        </div>
+        
+    </form>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/post-create.js') }}"></script>
+{% endblock %}
+</body>
+</html>

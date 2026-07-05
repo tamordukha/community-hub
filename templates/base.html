@@ -8,6 +8,9 @@
 <body>
 <div class="navbar">
     <div class="navbar-left">
+        <a href="{{ url_for('posts.index') }}" class="nav-home-btn">
+            <img src="{{ url_for('static', filename='icons/feed.png') }}" class="nav-home-btn">
+        </a>
         {% if session.user_id %}
             <img
                 src="{{ url_for('static', filename='uploads/avatars/' + (session.avatar if session.avatar else 'default.png')) }}"
@@ -39,10 +42,11 @@
     {% block content %}{% endblock %}
 </main>
 
-{% if session.user_id %}
+{% if show_bottom_bar and session.user_id %}
     <div class="bottom-bar">
         <a href="{{ url_for('posts.create_post') }}" class="btn-create">+</a>
     </div>
 {% endif %}
+{% block scripts %}{% endblock %}
 </body>
 </html>

@@ -18,7 +18,7 @@ def index():
         current_username = get_username(user["id"])
     posts = get_posts_with_authors(user)
 
-    return render_template("posts/index.html", posts=posts, current_username=current_username)
+    return render_template("posts/index.html", posts=posts, current_username=current_username, show_bottom_bar=True)
 
 
 @posts_bp.route("/post/<int:post_id>")
@@ -38,7 +38,8 @@ def show_post(post_id):
     return render_template(
         "posts/view.html", 
         post=post, comments=comments, user=user,
-        can_edit_post=can_edit_post, 
+        can_edit_post=can_edit_post,
+        can_delete_post=can_delete_post, 
         can_edit_comment=can_edit_comment, 
         can_delete_comment=can_delete_comment, 
         can_hide_comment=can_hide_comment

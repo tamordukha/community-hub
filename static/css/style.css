@@ -207,6 +207,86 @@ main {
     font-size: 19px;
 }
 
+.post-options {
+    display: flex;
+    flex-direction: column;
+    position: relative; /* Это понадобится в будущем, чтобы выпадающее меню не улетало */
+    width: 40px;
+    height: 40px;
+    margin-left: auto;
+    margin-bottom: auto;
+}
+
+.post-options-btn {
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: #000;
+    font-size: 30px;
+    width: 40px;
+    height: 40px;
+}
+
+.post-options-btn:hover {
+    background: #f5f5f5;
+}
+
+/* Выпадающее меню */
+.post-dropdown-menu {
+    /* Самое главное: absolute позиционирует меню относительно родителя (.post-options), 
+       у которого в вашем коде уже написано position: relative; */
+    position: absolute;
+    
+    /* Сдвигаем меню строго под кнопку */
+    top: 100%; 
+    /* Прижимаем к правому краю кнопки, чтобы оно аккуратно выпадало вправо-вниз */
+    right: 0; 
+    
+    /* Стили внешнего вида (как карточка) */
+    background-color: #ffffff;
+    min-width: 150px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Мягкая тень */
+    padding: 6px 0;
+    z-index: 100; /* Перекрывает любые элементы и текст под постом */
+    display: none; 
+}
+
+/* ЭТОТ КЛАСС БУДЕТ ДОБАВЛЯТЬ JAVASCRIPT ПРИ КЛИКЕ */
+.post-dropdown-menu.show {
+    display: block; /* Показывает меню */
+}
+
+/* Стили для ссылок-пунктов внутри меню */
+.dropdown-item {
+    display: block;
+    padding: 10px 16px;
+    color: #333333;
+    text-decoration: none; /* Убираем нижнее подчеркивание у ссылок */
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+/* Эффект наведения на обычные пункты */
+.dropdown-item:hover {
+    background-color: #f1f3f5;
+}
+
+/* Опасная кнопка «Удалить» (выделяем красным) */
+.dropdown-item.delete-item {
+    color: #dc3545;
+}
+
+/* Эффект наведения на кнопку «Удалить» */
+.dropdown-item.delete-item:hover {
+    background-color: #fff5f5;
+}
+
+
 /* Контент */
 
 .post-container .post-content {
@@ -228,6 +308,128 @@ main {
     font-size: 21px;
 }
 
+/* ===== Create post =====*/
+
+.post-create-content {
+    overflow: hidden;
+    line-height: 1.5;
+    margin-bottom: 5px;
+    color: #444;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+/* Контейнер-обертка для переключателя */
+.visibility-toggle {
+    display: inline-flex;       /* Сжимает контейнер по размеру кнопок */
+    background-color: #f1f3f5;  /* Светло-серый фон плашки */
+    padding: 4px;               /* Внутренний отступ, чтобы кнопки не прилипали к краям */
+    border-radius: 8px;        /* Скругление общей рамки */
+    margin-bottom: 20px;        /* Отступ снизу до кнопки Create */
+}
+
+/* Общие стили для обеих кнопок переключателя */
+.toggle-btn {
+    background: none;
+    border: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #495057;             /* Серый цвет текста для неактивной кнопки */
+    cursor: pointer;
+    border-radius: 6px;        /* Внутреннее скругление кнопок */
+    transition: all 0.2s ease;  /* Плавный переход цвета при клике */
+}
+
+/* Стили для АКТИВНОЙ кнопки (на которую нажали) */
+.toggle-btn.active {
+    background-color: #ffffff;  /* Белый фон */
+    color: #212529;             /* Темный текст */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); /* Легкая тень, приподнимающая кнопку */
+}
+
+/* Эффект наведения только на неактивную кнопку */
+.toggle-btn:not(.active):hover {
+    color: #000000;
+}
+
+/* На всякий случай фиксируем, чтобы в обычном состоянии у неактивной кнопки не выскакивал фон */
+.toggle-btn:not(.active) {
+    background: none !important;
+}
+
+/* Кнопка создания поста */
+
+.post-editor-form-actions {
+     width: 100%; /* Растягиваем обертку на всю ширину */
+}
+
+.post-editor-form-actions button {
+    padding: 10px 32px;       /* Увеличили отступы внутри (32px слева и справа), кнопка станет шире */
+    border-radius: 6px;       /* Скругляем углы, как у кнопок приватности */
+    border: none;             
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+/* ===== Comments list ===== */
+.comments {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+}
+
+.comments-header {
+    display: flex;            
+    justify-content: space-between; 
+    align-items: center;      /* Теперь это свойство сработает идеально ровно по центру */
+    padding: 10px 0;          /* Добавит по 10px свободного места сверху и снизу */
+    margin-bottom: 20px;      
+}
+
+.comments-header h3 {
+    margin: 0; /* Убирает невидимые отступы браузера, которые ломают выравнивание */
+}
+
+.comment-form {
+    display: flex;
+    flex-direction: column; /* Элементы внутри (верхний ряд и нижний ряд) встанут строго друг под друга */
+    gap: 12px;              /* Расстояние между верхним и нижним рядом */
+    width: 100%;            /* Блок растягивается на всю ширину родительского контейнера */
+    margin-bottom: 25px;    /* Отступ снизу, чтобы готовые комментарии не прижимались */
+}
+
+.comment-form-main {
+    display: flex;
+    align-items: center;    /* Выравнивает аватарку и текстовую линию ровно по центру по вертикали */
+    gap: 16px;              /* Расстояние между аватаркой и началом поля ввода */
+    width: 100%;
+}
+
+.comment-form-avatar {
+    width: 50px;            /* Фиксированная ширина */
+    height: 50px;           /* Фиксированная высота */
+    border-radius: 50%;     /* Делает картинку идеально круглой */
+    object-fit: cover;      /* Защищает фото от искажения и растягивания */
+}
+
+.comment-form-input {
+    flex-grow: 1;           /* Заставляет инпут занять всё оставшееся свободное место справа */
+    border: none;           /* Удаляем стандартную рамку со всех сторон */
+    border-bottom: 1px solid #000; /* Оставляем только одну тонкую черную линию снизу */
+    font-size: 15px;        /* Размер шрифта текста */
+    outline: none;          /* Убирает синюю рамку браузера при фокусе (клике) */
+    background: transparent;/* Прозрачный фон */
+    margin: 0 !important;
+}
+
+.comment-form-footer {
+    display: flex;
+    justify-content: flex-end; /* Сдвигает все кнопки в самый правый край */
+    align-items: center;
+    gap: 16px;              /* Расстояние между кнопками «Отмена» и «Оставить комментарий» */
+}
 
 /* === СЕТКА И РАСКЛАДКА === */
 .container {
@@ -289,6 +491,14 @@ textarea {
     font-family: inherit;
 }
 
+select {
+    width: 130px;
+    height: 42px; 
+    cursor: pointer;
+    font-size: 14px;
+    margin: 0
+}
+
 /* === КНОПКИ === */
 
 button,
@@ -304,13 +514,38 @@ button,
     font-size: 0.95rem;
 }
 
+.btn-login-regist {
+    padding-left: 175px;
+    padding-right: 175px;
+    margin-top: 15px;
+}
+
+.btn-comment-form {
+    padding-left: 15px;
+    padding-right: 15px;
+    background: none;
+    color: black;
+}
+
+.btn-post-editor {
+    width: 100% !important;     /* Кнопка займет всю ширину текстового поля */
+    padding: 12px 0 !important; 
+    border-radius: 6px !important; 
+    border: none !important;
+    font-weight: 500 !important;
+    cursor: pointer;
+}
+
+.nav-home-btn {
+    width: 25px;
+    height: 25px;
+}
+
 button:hover,
 .btn:hover {
     background: #194ee2;
 }
 
-.btn-login-regist {
-    padding-left: 175px;
-    padding-right: 175px;
-    margin-top: 15px;
+.btn-comment-form:hover {
+    background: #e2e2e2;
 }

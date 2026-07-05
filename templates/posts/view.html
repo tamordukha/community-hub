@@ -30,6 +30,21 @@
                     {{ post.author_username }}
                 </span>
             </div>
+
+            {% if can_delete_post(user,post) %}
+            <div class="post-options">
+                <button type="button" class="post-options-btn" id="post-menu-trigger">⋮</button>
+
+                <div class="post-dropdown-menu" id="post-dropdown-menu">
+                    <!-- Условие для Автора или Админа (видят всё) -->
+                    {% if can_edit_post(user, post)%}
+                        <a href="{{ url_for('posts.edit_post', post_id=post.id) }}" class="dropdown-item">Изменить</a>
+                    <!-- Условие для Модератора (только удалить) -->
+                    {% endif %}
+                        <a href="{{ url_for('posts.del_post', post_id=post.id) }}" class="dropdown-item delete-item" onclick="return confirm('Удалить этот пост?')">Удалить</a>
+                </div>
+            </div>
+            {% endif %}
         </div>
 
         <div class="post-content">
@@ -50,11 +65,42 @@
                 💬 {{ post.comment_count if post.comment_count else 0 }}
             </a>
         </div>
+
+        <div class="comments">
+            <div class="comments-header">
+                <h3>{{ comments|length }} Комментариев</h3>
+                <select name="sort" id="sort">
+                    <option value="1" selected>Недавнее</option>
+                    <option value="0">Популярное</option>
+                </select>
+            </div>
+
+            <div class="comment-form">
+                <div class="comment-form-main">
+                    <img
+                    src="{{ url_for('static', filename='uploads/avatars/' + (session.avatar if session.avatar else 'default.png')) }}"
+                    alt="avatar"
+                    class="comment-form-avatar"
+                    >
+                    <input class="comment-form-input" type="text"  id="comment-input" placeholder="Оставить комментарий">
+                </div>
+                <div class="comment-form-footer">
+                    <button type="button" class="btn-comment-form" id="comment-cancel">Отмена</button>
+                    <button type="submit" class="btn-comment-form" id="comment-submit">Оставить комментарий</button>
+                </div>
+            </div>
+            {% if comments %}
+                
+            {% endif %}
+        </div>
     </div>
 </div>
 
 
 
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/view.js') }}"></script>
 {% endblock %}
 </body>
 </html>

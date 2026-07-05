@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit post</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+    <h1>Edit post</h1>
+
+    <form method="POST">
+        <input type="text" name="title" id="title" placeholder="Название поста..." value="{{ post.title }}" required>
+
+        <textarea class="post-create-content" name="content" id="content" rows="7" placeholder="Расскажите свою историю...">{{ post.content }}</textarea>
+
+        <div class="visibility-toggle">
+            <!-- Скрытое поле, которое Flask автоматически прочитает при отправке формы -->
+            <input type="hidden" name="is_public" id="visibility-input" value="{{ post.is_public }}">
+            
+            <!-- Две кнопки-переключатели -->
+            {% if post.is_public==1 %}
+                <button type="button" class="toggle-btn active" data-value="1">Публичный</button>
+                <button type="button" class="toggle-btn" data-value="0">Приватный</button>
+            {% else %}
+                <button type="button" class="toggle-btn" data-value="1">Публичный</button>
+                <button type="button" class="toggle-btn active" data-value="0">Приватный</button>
+            {% endif %}
+        </div>
+
+        <div class="post-editor-form-actions">
+            <button type="submit" class="btn-post-editor">Edit</button>
+        </div>
+        
+    </form>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/post-create.js') }}"></script>
+{% endblock %}
+</body>
+</html>
