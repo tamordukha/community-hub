@@ -1,5 +1,6 @@
 from flask import Flask, Blueprint, current_app, render_template, request, redirect, url_for, session, abort
-from models.post import get_posts, get_post, add_post, update_post, delete_post, get_username, get_comments_for_post, get_username, get_posts_with_authors, get_post_with_author
+from models.post import get_posts, get_post, add_post, update_post, delete_post, get_username, get_username, get_posts_with_authors, get_post_with_author
+from models.comment import get_comments_for_post
 
 from utils.permissions import can_edit_post, can_delete_post, can_edit_comment, can_delete_comment, can_hide_comment, can_edit_reply, can_delete_reply
 

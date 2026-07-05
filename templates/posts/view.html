@@ -75,20 +75,24 @@
                 </select>
             </div>
 
-            <div class="comment-form">
-                <div class="comment-form-main">
-                    <img
-                    src="{{ url_for('static', filename='uploads/avatars/' + (session.avatar if session.avatar else 'default.png')) }}"
-                    alt="avatar"
-                    class="comment-form-avatar"
-                    >
-                    <input class="comment-form-input" type="text"  id="comment-input" placeholder="Оставить комментарий">
+            {% if session %}
+                <div class="comment-form">
+                    <form method="POST" action="{{ url_for('comments.create_comment', post_id=post.id) }}">
+                        <div class="comment-form-main">
+                            <img
+                            src="{{ url_for('static', filename='uploads/avatars/' + (session.avatar if session.avatar else 'default.png')) }}"
+                            alt="avatar"
+                            class="comment-form-avatar"
+                            >
+                            <input class="comment-form-input" type="text"  id="comment-input" name="content" placeholder="Оставить комментарий">
+                        </div>
+                        <div class="comment-form-footer">
+                            <button type="button" class="btn-comment-form" id="comment-cancel">Отмена</button>
+                            <button type="submit" class="btn-comment-form" id="comment-submit">Оставить комментарий</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="comment-form-footer">
-                    <button type="button" class="btn-comment-form" id="comment-cancel">Отмена</button>
-                    <button type="submit" class="btn-comment-form" id="comment-submit">Оставить комментарий</button>
-                </div>
-            </div>
+            {% endif %}
             {% if comments %}
                 
             {% endif %}

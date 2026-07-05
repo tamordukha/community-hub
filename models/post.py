@@ -73,31 +73,6 @@ def get_username(user_id):
     return user["username"] if user else None
 
 
-def get_comments_for_post(user, post_id):
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    cursor.execute(
-        """
-        SELECT c.*, u.username
-        FROM comments c
-        JOIN users u ON u.id = c.author_id
-        WHERE c.post_id = ?
-        ORDER BY c.created_at ASC
-        """,
-        (post_id,),
-    )
-
-    comments = cursor.fetchall()
-    conn.close()
-
-    comments = [dict(c) for c in comments]
-
-    if user is None or user["role"] == "user":
-        comments = [c for c in comments if not c["is_hidden"]]
-
-    return comments
-
 def get_posts_with_authors(user=None):
     conn = get_connection()
     cursor = conn.cursor()
