@@ -49,6 +49,15 @@ def can_delete_comment(user, comment):
         return True
     return False
 
+def can_hide_comment(user, post, comment):
+    if user is None or comment is None:
+        return False
+    if user["id"] == comment["author_id"]:
+        return None
+    if user["id"] == post["author_id"]:
+        return True
+    return user["role"] in ("moderator", "admin")
+
 
 def can_edit_reply(user, reply):
     return can_edit_comment(user, reply)
@@ -58,9 +67,13 @@ def can_delete_reply(user, reply):
     return can_delete_comment(user, reply)
 
 
-def can_hide_comment(user):
-    if user is None:
+def can_hide_reply(user, post, reply):
+    if user is None or reply is None:
         return False
+    if user["id"] == reply["author_id"]:
+        return None
+    if user["id"] == post["author_id"]:
+        return True
     return user["role"] in ("moderator", "admin")
 
 

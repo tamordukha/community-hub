@@ -32,27 +32,37 @@
             </div>
 
             {% if can_delete_post(user,post) %}
-            <div class="post-options">
-                <button type="button" class="post-options-btn" id="post-menu-trigger">⋮</button>
+            <form method="POST" action="{{ url_for('posts.del_post', post_id=post.id) }}" class="post-options-form" onsubmit="return confirm('Удалить этот пост?')">
+                <div class="post-options">
+                    <button type="button" class="post-options-btn" id="post-menu-trigger">⋮</button>
 
-                <div class="post-dropdown-menu" id="post-dropdown-menu">
-                    <!-- Условие для Автора или Админа (видят всё) -->
-                    {% if can_edit_post(user, post)%}
-                        <a href="{{ url_for('posts.edit_post', post_id=post.id) }}" class="dropdown-item">Изменить</a>
-                    <!-- Условие для Модератора (только удалить) -->
-                    {% endif %}
-                        <a href="{{ url_for('posts.del_post', post_id=post.id) }}" class="dropdown-item delete-item" onclick="return confirm('Удалить этот пост?')">Удалить</a>
+                    <div class="post-dropdown-menu" id="post-dropdown-menu">
+                        {% if can_edit_post(user, post)%}
+                            <a href="{{ url_for('posts.edit_post', post_id=post.id) }}" class="dropdown-item">Изменить</a>
+                        {% endif %}
+                            <button type="submit" class="dropdown-item delete-item">Удалить</button>
+                    </div>
                 </div>
-            </div>
+            </form>
+
             {% endif %}
         </div>
 
-        <div class="post-content">
-            {{ post.content }}
+        <div class="post-detail-content">
+            {% if post.content|length >= 300 %}
+                <div class="post-content-short">
+                    {{ post.content|truncate(300) }}
+                    <button type="button" class="post-read-more">read more...</button>
+                </div>
+                <div class="post-content-full"> 
+                    {{ post.content }} 
+                    <button type="button" class="post-hide">hide...</button>
+                </div>
+            {% else %}
+                {{ post.content }}
+            {% endif %}
         </div>
-        {% if post.content|length >=300 %}
-            <a href="{{ url_for('posts.show_post', post_id=post.id) }}" class="read-more">Read more...</a>
-        {% endif %}
+
         <div class="post-date">
             {{ post.created_at }}
         </div>
@@ -94,7 +104,246 @@
                 </div>
             {% endif %}
             {% if comments %}
-                
+                {% for comment in comments %}
+                    <div class="comment-item">
+                        <!-- Основной слой, скрывается когда изменяешь комментарий -->
+                        <div class="comment-item-main">
+                            <img
+                            src="{{ url_for('static', filename='uploads/avatars/' + (comment.avatar if comment.avatar else 'default.png')) }}"
+                            alt="avatar"
+                            class="comment-item-avatar"
+                            >
+                            <div class="comment-item-main-info">
+                                <span class="comment-item-username"> {{ comment.username }} </span>
+                                <span class="comment-item-date"> {{ comment.created_at }} </span>
+                            </div>
+
+                            <div class="comment-actions">
+                                {% if comment.is_hidden == 1 %}
+                                    <div class="comment-status">
+                                        <img src="{{ url_for('static', filename='icons/hide.png') }}" class="comment-status-icon">
+                                    </div>
+                                {% endif %}
+
+                                {% if can_delete_comment(user,comment) or can_hide_comment(user, post, comment)%}
+                                <div class="comment-options">
+                            
+                                    <button type="button" class="comment-options-btn" id="comment-menu-trigger">⋮</button>
+
+                                    <div class="comment-dropdown-menu" id="comment-dropdown-menu">
+
+                                        {% if can_edit_comment(user, comment)%}
+                                            <button type="button" class="dropdown-item comment-edit-trigger-btn" data-comment-id="{{ comment.id }}">Изменить</button>
+                                        {% endif %}
+
+                                        {% if can_hide_comment(user, post, comment) %}
+                                            <form method="POST" class="comment-options-form" action="{{ url_for('comments.toggle_hide_comment', comment_id=comment.id, post_id=post.id) }}">
+                                                {% if comment.is_hidden == 1 %}
+                                                    <button type="submit" class="dropdown-item">Восстановить</button>
+                                                {% else %}
+                                                    <button type="submit" class="dropdown-item">Скрыть</button>
+                                                {% endif %}
+                                            </form>
+                                        {% endif %}
+
+                                        <form method="POST" class="comment-options-form" action="{{ url_for('comments.del_comment', comment_id=comment.id, post_id=post.id) }}" onclick="return confirm('Удалить этот комментарий?')">
+                                            <button type="submit" class="dropdown-item delete-item">Удалить</button>
+                                        </form>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Основной слой, скрывается когда изменяешь комментарий -->
+                        <div class="comment-item-content">
+                            {% if comment.content|length >= 200 %}
+                                <div class="comment-content-short">
+                                    {{ comment.content|truncate(200) }}
+                                    <button type="button" class="comment-read-more">read more...</button>
+                                </div>
+                                <div class="comment-content-full"> 
+                                    {{ comment.content }} 
+                                    <button type="button" class="comment-hide">hide...</button>
+                                </div>
+                            {% else %}
+                                {{ comment.content }}
+                            {% endif %}
+                        </div>
+
+                        <!-- Основной слой, скрывается когда изменяешь комментарий -->
+                        <div class="comment-item-footer">
+                            <span class="likes">
+                                ❤️ {{ comment.like_count if comment.like_count else 0 }}
+                            </span>
+                            {% if session %}
+                                <button type="button" class="comment-item-reply">Ответить...</button>
+                            {% endif %}
+                        </div>
+
+                        
+                        <div class="comment-edit-form hidden">
+                            <form method="POST" action="{{ url_for('comments.edit_comment', post_id=post.id, comment_id=comment.id) }}">
+                                <div class="comment-edit-form-main">
+                                    <img
+                                    src="{{ url_for('static', filename='uploads/avatars/' + (comment.avatar if comment.avatar else 'default.png')) }}"
+                                    alt="avatar"
+                                    class="comment-form-avatar"
+                                    >
+                                    <input class="comment-edit-form-input" type="text" name="content" placeholder="Изменить комментарий" value="{{comment.content}}">
+                                </div>
+                                <div class="comment-edit-form-footer">
+                                    <button type="button" class="btn-comment-edit-form">Отмена</button>
+                                    <button type="submit" class="btn-comment-edit-form">Обновить комментарий</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="reply-form hidden">
+                            <form method="POST" action="{{ url_for('replies.create_reply', post_id=post.id, comment_id=comment.id) }}">
+                                <div class="reply-form-main">
+                                    <img
+                                    src="{{ url_for('static', filename='uploads/avatars/' + (session.avatar if session.avatar else 'default.png')) }}"
+                                    alt="avatar"
+                                    class="reply-form-avatar"
+                                    >
+                                    <input class="reply-form-input" type="text" name="content" id="reply-input" placeholder="Ответить на комментарий">
+                                </div>
+                                <div class="reply-form-footer">
+                                    <button type="button" class="btn-reply-form">Отмена</button>
+                                    <button type="submit" class="btn-reply-form">Оставить ответ</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        
+
+                        {% if replies_count[comment.id] %}
+                        <div class="replies hidden">
+                            {% for reply in replies[comment.id] %}
+                                <div class="reply-item">
+                                    <div class="reply-item-main">
+
+                                        <div class="reply-item-avatar">
+                                            <img
+                                            src="{{ url_for('static', filename='uploads/avatars/' + (reply.avatar if reply.avatar else 'default.png')) }}"
+                                            alt="avatar"
+                                            class="comment-item-avatar"
+                                            >
+                                        </div>
+
+                                        <div class="reply-item-main-info">
+                                            {% if reply.parent_reply_id %}
+                                                <span class="reply-item-username"> {{ reply.username }} -> {{ reply.parent_reply_username }}</span>
+                                            {% else %}
+                                                <span class="reply-item-username"> {{ reply.username }} </span>
+                                            {% endif %}
+                                            <span class="reply-item-date"> {{ reply.created_at }} </span>
+                                        </div>
+
+                                        
+                                        <div class="reply-actions">
+                                            {% if reply.is_hidden == 1 %}
+                                                <div class="reply-status">
+                                                    <img src="{{ url_for('static', filename='icons/hide.png') }}" class="reply-status-icon">
+                                                </div>
+                                            {% endif %}
+
+                                            {% if can_delete_reply(user,reply) or can_hide_reply(user, post, reply)%}
+                                            <div class="reply-options">
+                                                <button type="button" class="reply-options-btn" id="reply-menu-trigger">⋮</button>
+
+                                                <div class="reply-dropdown-menu" id="reply-dropdown-menu">
+
+                                                    {% if can_edit_reply(user, reply) %}
+                                                        <button type="button" class="dropdown-item reply-edit-trigger-btn" data-reply-id="{{ reply.id }}">Изменить</button>
+                                                    {% endif %}
+
+                                                    {% if can_hide_reply(user, post, reply) %}
+                                                        <form method="POST" class="reply-options-form" action="{{ url_for('replies.toggle_hide_reply', reply_id=reply.id, post_id=post.id) }}">
+                                                            {% if reply.is_hidden == 1 %}
+                                                                <button type="submit" class="dropdown-item">Восстановить</button>
+                                                            {% else %}
+                                                                <button type="submit" class="dropdown-item">Скрыть</button>
+                                                            {% endif %}
+                                                        </form>
+                                                    {% endif %}
+
+                                                    <form method="POST" class="reply-options-form" action="{{ url_for('replies.del_reply', reply_id=reply.id, post_id=post.id) }}" onclick="return confirm('Удалить этот комментарий?')">
+                                                        <button type="submit" class="dropdown-item delete-item">Удалить</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="reply-item-content">
+                                        {% if reply.content|length >= 200 %}
+                                            <div class="reply-content-short">
+                                                {{ reply.content|truncate(200) }}
+                                                <button type="button" class="reply-read-more">read more...</button>
+                                            </div>
+                                            <div class="reply-content-full"> 
+                                                {{ reply.content }} 
+                                                <button type="button" class="reply-hide">hide...</button>
+                                            </div>
+                                        {% else %}
+                                            {{ reply.content }}
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="reply-item-footer">
+                                        <span class="likes">
+                                            ❤️ {{ reply.like_count if reply.like_count else 0 }}
+                                        </span>
+                                        {% if session %}
+                                            <button type="button" class="reply-item-reply">Ответить...</button>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="reply-edit-form hidden">
+                                        <form method="POST" action="{{ url_for('replies.edit_reply', post_id=post.id, comment_id=comment.id, reply_id=reply.id) }}">
+                                            <div class="reply-edit-form-main">
+                                                <img
+                                                src="{{ url_for('static', filename='uploads/avatars/' + (reply.avatar if reply.avatar else 'default.png')) }}"
+                                                alt="avatar"
+                                                class="reply-form-avatar"
+                                                >
+                                                <input class="reply-edit-form-input" type="text" name="content" placeholder="Изменить комментарий" value="{{reply.content}}">
+                                            </div>
+                                            <div class="reply-edit-form-footer">
+                                                <button type="button" class="btn-reply-edit-form">Отмена</button>
+                                                <button type="submit" class="btn-reply-edit-form">Обновить комментарий</button>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                    <div class="reply-to-reply-form hidden">
+                                        <form method="POST" action="{{ url_for('replies.create_reply_to_reply', post_id=post.id, comment_id=comment.id, parent_reply_id=reply.id) }}">
+                                            <div class="reply-to-reply-form-main">
+                                                <img
+                                                src="{{ url_for('static', filename='uploads/avatars/' + (session.avatar if session.avatar else 'default.png')) }}"
+                                                alt="avatar"
+                                                class="reply-to-reply-form-avatar"
+                                                >
+                                                <input class="reply-to-reply-form-input" type="text" name="content" placeholder="Ответить на комментарий {{reply.username}}">
+                                            </div>
+                                            <div class="reply-to-reply-form-footer">
+                                                <button type="button" class="btn-reply-to-reply-form">Отмена</button>
+                                                <button type="submit" class="btn-reply-to-reply-form">Оставить ответ</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                
+                            {% endfor %}
+                        </div>
+                        <button class="toggle-reply" data-action="show"> Показать ответы ({{ replies_count[comment.id] }})</button>
+                        {% endif %}  
+                    </div>
+                {% endfor %}
             {% endif %}
         </div>
     </div>

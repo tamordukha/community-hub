@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS replies (
     author_id INTEGER NOT NULL,
     content TEXT NOT NULL,
     parent_reply_id INTEGER DEFAULT NULL,
+    is_hidden INTEGER NOT NULL DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (comment_id) REFERENCES comments(id),
     FOREIGN KEY (author_id) REFERENCES users(id),

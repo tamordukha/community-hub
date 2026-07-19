@@ -1,5 +1,6 @@
 import sqlite3
 from database.db import get_connection
+from models.post import get_post
 
 '''
 1) Выдать комментарии к посту get_comments_for_post
@@ -16,7 +17,7 @@ def get_comments_for_post(user, post_id):
 
     cursor.execute(
         """
-        SELECT c.*, u.username
+        SELECT c.*, u.username, u.avatar
         FROM comments c
         JOIN users u ON u.id = c.author_id
         WHERE c.post_id = ?
@@ -29,8 +30,9 @@ def get_comments_for_post(user, post_id):
     conn.close()
 
     comments = [dict(c) for c in comments]
+    post = get_post(post_id)
 
-    if user is None or user["role"] == "user":
+    if user is None or user["role"] == "user" and post["author_id"] != user["id"]:
         comments = [c for c in comments if not c["is_hidden"]]
 
     return comments
@@ -87,6 +89,6 @@ def hide_comment(comment_id):
     comment = get_comment(comment_id)
     is_hidden = 0 if comment["is_hidden"] == 1 else 1
 
-    cursor.execute("UPDATE comments WHERE is_hidden = ?", (is_hidden,))
+    cursor.execute("UPDATE comments SET is_hidden = ? WHERE id = ?", (is_hidden, comment_id))
     conn.commit()
     conn.close()

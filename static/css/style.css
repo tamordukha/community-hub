@@ -161,10 +161,14 @@ main {
 }
 
 .read-more {
-    font-size: 13px;
-    color: #007bff;
+    font-size: 14px;
+    color: #0056b3;
     display: block;
     margin-bottom: 5px;
+}
+
+.read-more:hover {
+    text-decoration: underline;
 }
 
 /* Дата */
@@ -210,11 +214,23 @@ main {
 .post-options {
     display: flex;
     flex-direction: column;
-    position: relative; /* Это понадобится в будущем, чтобы выпадающее меню не улетало */
+    position: relative; 
     width: 40px;
     height: 40px;
-    margin-left: auto;
-    margin-bottom: auto;
+    /* margin-left: auto; — убрали отсюда, так как оно теперь на форме выше */
+}
+
+/* Полное обнуление глобальных стилей для формы вокруг троеточия */
+.post-options-form {
+    padding: 0 !important;          /* Уничтожаем отступ в 55px */
+    margin: 0 !important;           /* Убираем любые внешние отступы */
+    border: none !important;        /* Стираем серую рамку */
+    border-radius: 0 !important;    /* Сбрасываем скругление */
+    background: transparent !important; /* Гарантируем прозрачный фон */
+    
+    /* Толкаем всю форму (вместе с кнопкой внутри) в самый правый край карточки поста */
+    margin-left: auto !important;   
+    display: inline-block;          /* Позволяет форме сжаться до размеров кнопки */
 }
 
 .post-options-btn {
@@ -279,6 +295,12 @@ main {
 /* Опасная кнопка «Удалить» (выделяем красным) */
 .dropdown-item.delete-item {
     color: #dc3545;
+    width: 100%;          /* Растягиваем кнопку на всю ширину выпадающего меню */
+    text-align: left;     /* Выравниваем текст по левому краю, как у обычных ссылок */
+    background: none;     /* Убираем стандартный серый фон кнопки */
+    border: none;         /* Убираем рамку */
+    cursor: pointer;      /* Добавляем пальчик при наведении */
+    
 }
 
 /* Эффект наведения на кнопку «Удалить» */
@@ -289,17 +311,50 @@ main {
 
 /* Контент */
 
-.post-container .post-content {
+.post-detail-content {
     font-size: 18px;       
     line-height: 1.6;
+    color: #444;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
-.post-container .read-more {
-    font-size: 19px;
+
+/* Read more... часть с js */
+.post-read-more, .post-hide {
+    background: none;
+    border: none;
+    color: #0056b3; /* Синий цвет ссылки */
+    padding: 0;
+    margin-left: 5px;
+    font-size: 17px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.post-read-more:hover, .post-hide:hover {
+    text-decoration: underline; /* Подчеркивание при наведении */
+    background: none;
+}
+
+/* Полный текст комментария изначально полностью скрыт от пользователя */
+.post-content-full {
+    display: none;
+}
+
+/* Специальный класс-помощник, чтобы жестко спрятать короткий текст при раскрытии */
+.post-content-short.hidden {
+    display: none !important;
+}
+
+/* Специальный класс-помощник, чтобы жестко показать полный текст при клике */
+.post-content-full.active {
+    display: block !important;
 }
 
 /* Дата */
 .post-container .post-date {
+    margin-top: 5px;
     font-size: 15px;
 }
 
@@ -317,6 +372,8 @@ main {
     color: #444;
     word-break: break-word;
     overflow-wrap: break-word;
+    max-height: 400px;  /* Ограничьте высоту */
+    overflow-y: auto;   /* Скролл внутри textarea */
 }
 
 /* Контейнер-обертка для переключателя */
@@ -373,7 +430,7 @@ main {
     font-size: 14px;
 }
 
-/* ===== Comments list ===== */
+/* ===== COMMENTS LIST ===== */
 .comments {
     margin-top: 30px;
     padding-top: 20px;
@@ -391,6 +448,334 @@ main {
 .comments-header h3 {
     margin: 0; /* Убирает невидимые отступы браузера, которые ломают выравнивание */
 }
+
+/* ==== КОММЕНТАРИЙ ==== */
+
+/* Контейнер одной карточки комментария */
+.comment-item {
+    display: flex;
+    flex-direction: column;   /* Элементы (шапка, текст, подвал) идут строго друг под друга */
+    gap: 3px;                /* Расстояние между шапкой, текстом и подвалом */
+    padding: 16px 0;          /* Внутренние отступы сверху и снизу */
+    border-top: 1px solid #f1f3f5; /* Аккуратная тонкая линия-разделитель между комментариями */
+    position: relative;
+}
+
+/* --- 1. Шапка комментария (Аватарка + инфо) --- */
+.comment-item-main {
+    display: flex;
+    align-items: center;      /* Выравнивает круглую аватарку и текст по центру по вертикали */
+    gap: 12px;                /* Расстояние между аватаркой и текстом справа */
+}
+
+.comment-item-main.active {
+    display: flex !important;
+}
+.comment-item-main.hidden {
+    display: none !important;
+}
+
+/* Круглая аватарка автора комментария */
+.comment-item-avatar {
+    width: 38px;              /* Фиксированная ширина */
+    height: 38px;             /* Фиксированная высота */
+    border-radius: 50%;       /* Делает картинку идеально круглой */
+    object-fit: cover;        /* Защищает фото от искажения */
+}
+
+/* Контейнер для имени и даты */
+.comment-item-main-info {
+    display: flex;
+    flex-direction: column;   /* Переключает элементы в колонну: дата падает СТРОГО ПОД имя */
+    gap: 2px;                 /* Минимальный зазор между именем и датой */
+}
+
+/* Имя автора комментария */
+.comment-item-username {
+    font-size: 14px;
+    font-weight: 600;         /* Слегка жирный шрифт, чтобы имя выделялось */
+    color: #212529;           /* Насыщенный темный цвет текста */
+    line-height: 1.2;
+}
+
+/* Дата публикации */
+.comment-item-date {
+    font-size: 12px;          /* Дата должна быть визуально меньше имени */
+    color: #868e96;           /* Приглушенный серый цвет */
+    line-height: 1.2;
+}
+
+/* Hide значок комментария */
+.comment-status {
+    display: flex;
+    flex-direction: column;
+    width: 20px;
+    height: 20px;
+}
+
+.comment-status-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* Новый контейнер-обертка, который заберет весь отступ слева */
+.comment-actions {
+    display: flex;
+    align-items: center; /* Выравнивает глаз и троеточие по вертикали */
+    margin-left: auto;   /* Прижимает ВСЮ ГРУППУ (и глаз, и точки) к правому краю */
+    gap: 6px;            /* Расстояние между глазом и троеточием (настройте под себя) */
+}
+
+/* Options, 3 точки у комментариев */
+.comment-options {
+    display: flex;
+    flex-direction: column;
+    position: relative; /* Это понадобится в будущем, чтобы выпадающее меню не улетало */
+    width: 30px;
+    height: 30px;
+    margin-bottom: auto;
+}
+
+.comment-options-btn {
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: #000;
+    font-size: 20px;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+}
+
+.comment-options-btn:hover {
+    background: #f5f5f5;
+}
+
+
+/* == COMMENT OPTIONS FORM ==*/
+
+/* 1. Глобальный сброс для форм внутри выпадающего меню */
+.comment-options-form {
+    padding: 0 !important;          
+    margin: 0 !important;           
+    border: none !important;        
+    border-radius: 0 !important;    
+    background: transparent !important; 
+    width: 100% !important;                    
+    display: block !important;                 
+}
+
+/* 2. Единый стиль для ВСЕХ кнопок в меню (и обычной "Изменить", и кнопок в формах) */
+.comment-dropdown-menu .dropdown-item,
+.comment-options-form button.dropdown-item {
+    width: 100% !important;         /* Растягиваем на всю ширину меню */
+    text-align: left !important;    /* Выравниваем текст по левому краю */
+    background: none !important;    /* УНИЧТОЖАЕМ СИНИЙ ФОН, делаем его прозрачным */
+    border: none !important;        /* Убираем рамки */
+    cursor: pointer !important;     /* Добавляем пальчик при наведении */
+    padding: 10px 16px !important;  /* Одинаковые аккуратные отступы для всех */
+    font-size: 14px !important;     
+    font-weight: 500 !important;    
+    color: #333333 !important;      /* Делаем текст "Изменить" и "Скрыть" темно-серым */
+    display: block !important;      /* Выстраиваем их строго друг под друга */
+    box-shadow: none !important;    /* Убираем возможные тени от глобальных кнопок */
+    border-radius: 0 !important;    /* Убираем скругления у самих кнопок, они должны быть прямоугольными внутри меню */
+}
+
+/* 3. Эффект наведения для безопасных пунктов ("Изменить" и "Скрыть") */
+.comment-dropdown-menu .dropdown-item:not(.delete-item):hover,
+.comment-options-form button.dropdown-item:not(.delete-item):hover {
+    background-color: #f1f3f5 !important; /* Приятный светло-серый фон вместо синего */
+    color: #000000 !important;
+}
+
+/* 4. Изолированный стиль для опасной кнопки "Удалить" */
+.comment-dropdown-menu .delete-item,
+.comment-options-form button.delete-item {
+    color: #dc3545 !important;       /* Оставляем четкий красный цвет текста */
+}
+
+/* Эффект наведения на кнопку "Удалить" */
+.comment-dropdown-menu .delete-item:hover,
+.comment-options-form button.delete-item:hover {
+    background-color: #fff5f5 !important; /* Нежный красный фон при наведении */
+}
+
+
+
+
+/* Выпадающее меню */
+.comment-dropdown-menu {
+    /* Самое главное: absolute позиционирует меню относительно родителя (.post-options), 
+       у которого в вашем коде уже написано position: relative; */
+    position: absolute;
+    
+    /* Сдвигаем меню строго под кнопку */
+    top: 100%; 
+    /* Прижимаем к правому краю кнопки, чтобы оно аккуратно выпадало вправо-вниз */
+    right: 0; 
+    
+    /* Стили внешнего вида (как карточка) */
+    background-color: #ffffff;
+    min-width: 150px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Мягкая тень */
+    padding: 6px 0;
+    z-index: 102; /* Перекрывает любые элементы и текст под постом */
+    display: none; 
+}
+
+/* ЭТОТ КЛАСС БУДЕТ ДОБАВЛЯТЬ JAVASCRIPT ПРИ КЛИКЕ */
+.comment-dropdown-menu.show {
+    display: block; /* Показывает меню */
+}
+
+/* Стили для ссылок-пунктов внутри меню */
+.dropdown-item {
+    display: block;
+    padding: 10px 16px;
+    color: #333333;
+    text-decoration: none; /* Убираем нижнее подчеркивание у ссылок */
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+/* Эффект наведения на обычные пункты */
+.dropdown-item:hover {
+    background-color: #f1f3f5;
+}
+
+/* Опасная кнопка «Удалить» (выделяем красным) */
+.dropdown-item.delete-item {
+    color: #dc3545;
+}
+
+/* Эффект наведения на кнопку «Удалить» */
+.dropdown-item.delete-item:hover {
+    background-color: #fff5f5;
+}
+
+
+/* --- 2. Тело комментария (Текст сообщения) --- */
+.comment-item-content {
+    font-size: 15px;          /* Комфортный для чтения размер шрифта */
+    color: #333333;           /* Цвет основного текста */
+    line-height: 1.5;         /* Хороший межстрочный интервал, чтобы текст не слипался */
+    padding-left: 50px;       /* Сдвигаем текст вправо, чтобы он начинался ровно под именем, а не под аватаркой */
+    word-break: break-word;   /* Защита от поломки верстки, если пользователь введет очень длинное слово */
+}
+
+.comment-item-content.active {
+    display: flex !important;
+}
+.comment-item-content.hidden {
+    display: none !important;
+}
+
+.comment-read-more, .comment-hide {
+    background: none;
+    border: none;
+    color: #0056b3; /* Синий цвет ссылки */
+    padding: 0;
+    margin-left: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.comment-read-more:hover, .comment-hide:hover {
+    text-decoration: underline; /* Подчеркивание при наведении */
+    background: none;
+}
+
+/* Полный текст комментария изначально полностью скрыт от пользователя */
+.comment-content-full {
+    display: none;
+}
+
+/* Специальный класс-помощник, чтобы жестко спрятать короткий текст при раскрытии */
+.comment-content-short.hidden {
+    display: none !important;
+}
+
+/* Специальный класс-помощник, чтобы жестко показать полный текст при клике */
+.comment-content-full.active {
+    display: block !important;
+}
+
+/* --- 3. Подвал комментария (Лайки + Кнопка) --- */
+.comment-item-footer {
+    display: flex;
+    align-items: center;      /* Выравнивает лайки и кнопку «Ответить» на одной горизонтальной линии */
+    gap: 16px;                /* Расстояние между лайками и кнопкой */
+    padding-left: 50px;       /* Тоже сдвигаем вправо в одну линию с текстом */
+    padding-top: 5px;
+}
+
+.comment-item-footer.active {
+    display: flex !important;
+}
+.comment-item-footer.hidden {
+    display: none !important;
+}
+
+/* Блок с лайками */
+.comment-item-footer .likes {
+    font-size: 13px;
+    color: #495057;
+    cursor: default;          
+    
+    /* ИСПРАВЛЕНИЕ: превращаем блок в гибкий контейнер и центрируем эмодзи */
+    display: inline-flex;     
+    align-items: center;      /* Выравнивает сердечко и текст ровно по центру синей рамки */
+    line-height: 1;           /* Сбрасываем лишнюю высоту строки, чтобы убрать пустоту снизу */
+}
+
+
+/* Кнопка «Ответить...» */
+.comment-item-reply {
+    background: none;         /* Убираем дефолтный фон кнопки */
+    border: none;             /* Убираем дефолтную рамку */
+    color: #6c757d;           /* Серый цвет текста */
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;          /* Курсор-пальчик при наведении */
+    padding: 0;               /* Сбрасываем внутренние отступы */
+    transition: color 0.2s ease; /* Плавная анимация цвета */
+    height: 100%;
+}
+
+/* Эффект наведения на кнопку «Ответить» */
+.comment-item-reply:hover {
+    color: #212529;           /* Текст кнопки становится темнее и четче */
+    background: none;
+}
+
+.toggle-reply {
+    background: none;
+    border: none;
+    color: #000;
+    font-size: 14px;
+    margin-left: 50px;
+    padding: 8px;
+    width: 94%;
+    border-radius: 20px;
+
+    display: inline-flex;
+    justify-content: center; /* Центр по горизонтали */
+    align-items: center;     /* Центр по вертикали */
+}
+
+
+.toggle-reply:hover {
+    background: #f0f0f0;;
+}
+
+/* =============== СОЗДАНИЕ КОММЕНТАРИЯ =============== */
 
 .comment-form {
     display: flex;
@@ -430,6 +815,544 @@ main {
     align-items: center;
     gap: 16px;              /* Расстояние между кнопками «Отмена» и «Оставить комментарий» */
 }
+
+
+/* =============== ИЗМЕНЕНИЕ КОММЕНТАРИЯ =============== */
+
+.comment-edit-form * {
+    /* Сброс наследования */
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+.comment-edit-form {
+    display: flex;
+    flex-direction: column; /* Элементы внутри (верхний ряд и нижний ряд) встанут строго друг под друга */
+    gap: 12px;              /* Расстояние между верхним и нижним рядом */
+    width: 100%;            /* Блок растягивается на всю ширину родительского контейнера */
+}
+
+.comment-edit-form.active {
+    display: flex;
+}
+
+.comment-edit-form.hidden {
+    display: none;
+}
+
+.comment-edit-form-main {
+    display: flex;
+    align-items: center;    /* Выравнивает аватарку и текстовую линию ровно по центру по вертикали */
+    gap: 16px;              /* Расстояние между аватаркой и началом поля ввода */
+    width: 100%;
+}
+
+.comment-edit-form-avatar {
+    width: 38px;            /* Фиксированная ширина */
+    height: 38px;           /* Фиксированная высота */
+    border-radius: 50%;     /* Делает картинку идеально круглой */
+    object-fit: cover;      /* Защищает фото от искажения и растягивания */
+}
+
+.comment-edit-form-input {
+    flex-grow: 1;           /* Заставляет инпут занять всё оставшееся свободное место справа */
+    border: none;           /* Удаляем стандартную рамку со всех сторон */
+    border-bottom: 1px solid #000; /* Оставляем только одну тонкую черную линию снизу */
+    font-size: 13px;        /* Размер шрифта текста */
+    outline: none;          /* Убирает синюю рамку браузера при фокусе (клике) */
+    background: transparent;/* Прозрачный фон */
+    margin: 0 !important;
+}
+
+.comment-edit-form-footer {
+    display: flex;
+    justify-content: flex-end; /* Сдвигает все кнопки в самый правый край */
+    align-items: center;
+    gap: 16px;              /* Расстояние между кнопками «Отмена» и «Оставить комментарий» */
+}
+
+/* ============== ОТВЕТИТЬ на КОММЕНТАРИЙ ================== */
+
+
+.reply-form * {
+    /* Сброс наследования */
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.reply-form {
+    background: #f5f5f5;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column; /* Элементы внутри (верхний ряд и нижний ряд) встанут строго друг под друга */
+    gap: 12px;              /* Расстояние между верхним и нижним рядом */
+    width: 91%;            /* Блок растягивается на всю ширину родительского контейнера */
+    padding: 10px;
+    margin-left: 50px;
+    margin-top: 10px;
+}
+
+.reply-form.active {
+    display: flex;
+}
+
+.reply-form.hidden {
+    display: none;
+}
+
+.reply-form-main {
+    display: flex;
+    align-items: center;    /* Выравнивает аватарку и текстовую линию ровно по центру по вертикали */
+    gap: 12px;              /* Расстояние между аватаркой и началом поля ввода */
+    width: 100%;
+}
+
+.reply-form-avatar {
+    width: 44px;            /* Фиксированная ширина */
+    height: 44px;           /* Фиксированная высота */
+    border-radius: 50%;     /* Делает картинку идеально круглой */
+    object-fit: cover;      /* Защищает фото от искажения и растягивания */
+}
+
+.reply-form-input {
+    flex-grow: 1;           /* Заставляет инпут занять всё оставшееся свободное место справа */
+    border: none;           /* Удаляем стандартную рамку со всех сторон */
+    border-bottom: 1px solid #000; /* Оставляем только одну тонкую черную линию снизу */
+    font-size: 14px;        /* Размер шрифта текста */
+    outline: none;          /* Убирает синюю рамку браузера при фокусе (клике) */
+    background: transparent;/* Прозрачный фон */
+    margin: 0 !important;
+}
+
+.reply-form-footer {
+    display: flex;
+    justify-content: flex-end; /* Сдвигает все кнопки в самый правый край */
+    align-items: center;
+    gap: 16px;              /* Расстояние между кнопками «Отмена» и «Оставить комментарий» */
+}
+
+
+/* =============== ИЗМЕНЕНИЕ ОТВЕТА =============== */
+
+.reply-edit-form * {
+    /* Сброс наследования */
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+.reply-edit-form {
+    display: flex;
+    flex-direction: column; /* Элементы внутри (верхний ряд и нижний ряд) встанут строго друг под друга */
+    gap: 12px;              /* Расстояние между верхним и нижним рядом */
+    width: 100%;            /* Блок растягивается на всю ширину родительского контейнера */
+}
+
+.reply-edit-form.active {
+    display: flex;
+}
+
+.reply-edit-form.hidden {
+    display: none;
+}
+
+.reply-edit-form-main {
+    display: flex;
+    align-items: center;    /* Выравнивает аватарку и текстовую линию ровно по центру по вертикали */
+    gap: 16px;              /* Расстояние между аватаркой и началом поля ввода */
+    width: 100%;
+}
+
+.reply-edit-form-avatar {
+    width: 38px;            /* Фиксированная ширина */
+    height: 38px;           /* Фиксированная высота */
+    border-radius: 50%;     /* Делает картинку идеально круглой */
+    object-fit: cover;      /* Защищает фото от искажения и растягивания */
+}
+
+.reply-edit-form-input {
+    flex-grow: 1;           /* Заставляет инпут занять всё оставшееся свободное место справа */
+    border: none;           /* Удаляем стандартную рамку со всех сторон */
+    border-bottom: 1px solid #000; /* Оставляем только одну тонкую черную линию снизу */
+    font-size: 13px;        /* Размер шрифта текста */
+    outline: none;          /* Убирает синюю рамку браузера при фокусе (клике) */
+    background: transparent;/* Прозрачный фон */
+    margin: 0 !important;
+}
+
+.reply-edit-form-footer {
+    display: flex;
+    justify-content: flex-end; /* Сдвигает все кнопки в самый правый край */
+    align-items: center;
+    gap: 16px;              /* Расстояние между кнопками «Отмена» и «Оставить комментарий» */
+}
+
+/* ============== ОТВЕТИТЬ на ОТВЕТ ================== */
+
+
+.reply-to-reply-form * {
+    /* Сброс наследования */
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.reply-to-reply-form {
+    background: #f5f5f5;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column; /* Элементы внутри (верхний ряд и нижний ряд) встанут строго друг под друга */
+    gap: 12px;              /* Расстояние между верхним и нижним рядом */
+    width: 97%;            /* Блок растягивается на всю ширину родительского контейнера */
+    padding: 10px;
+}
+
+.reply-to-reply-form.active {
+    display: flex;
+}
+
+.reply-to-reply-form.hidden {
+    display: none;
+}
+
+.reply-to-reply-form-main {
+    display: flex;
+    align-items: center;    /* Выравнивает аватарку и текстовую линию ровно по центру по вертикали */
+    gap: 12px;              /* Расстояние между аватаркой и началом поля ввода */
+    width: 100%;
+}
+
+.reply-to-reply-form-avatar {
+    width: 44px;            /* Фиксированная ширина */
+    height: 44px;           /* Фиксированная высота */
+    border-radius: 50%;     /* Делает картинку идеально круглой */
+    object-fit: cover;      /* Защищает фото от искажения и растягивания */
+}
+
+.reply-to-reply-form-input {
+    flex-grow: 1;           /* Заставляет инпут занять всё оставшееся свободное место справа */
+    border: none;           /* Удаляем стандартную рамку со всех сторон */
+    border-bottom: 1px solid #000; /* Оставляем только одну тонкую черную линию снизу */
+    font-size: 14px;        /* Размер шрифта текста */
+    outline: none;          /* Убирает синюю рамку браузера при фокусе (клике) */
+    background: transparent;/* Прозрачный фон */
+    margin: 0 !important;
+}
+
+.reply-to-reply-form-footer {
+    display: flex;
+    justify-content: flex-end; /* Сдвигает все кнопки в самый правый край */
+    align-items: center;
+    gap: 16px;              /* Расстояние между кнопками «Отмена» и «Оставить комментарий» */
+}
+
+/* ========================== REPLIES - ОТВЕТЫ ============================ */
+
+/* Основные формы */
+
+.replies {
+    padding-left: 50px;
+    padding-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.replies.active {
+    display: flex;
+}
+.replies.hidden {
+    display: none;
+}
+
+.reply-item {
+    display: flex;
+    flex-direction: column;   /* Элементы (шапка, текст, подвал) идут строго друг под друга */
+    gap: 3px;                /* Расстояние между шапкой, текстом и подвалом */
+    background: #f5f5f5;
+    border-radius: 20px;
+    padding: 10px;
+    position: relative;
+}
+
+/* --- 1. Шапка ответа (Аватарка + инфо) --- */
+.reply-item-main {
+    display: flex;
+    align-items: center;      /* Выравнивает круглую аватарку и текст по центру по вертикали */
+    gap: 12px;                /* Расстояние между аватаркой и текстом справа */
+}
+
+.reply-item-main.active {
+    display: flex !important;
+}
+.reply-item-main.hidden {
+    display: none !important;
+}
+
+/* Круглая аватарка автора ответа */
+.reply-item-avatar {
+    width: 38px;              /* Фиксированная ширина */
+    height: 38px;             /* Фиксированная высота */
+    border-radius: 50%;       /* Делает картинку идеально круглой */
+    object-fit: cover;        /* Защищает фото от искажения */
+}
+
+/* Контейнер для имени и даты */
+.reply-item-main-info {
+    display: flex;
+    flex-direction: column;   /* Переключает элементы в колонну: дата падает СТРОГО ПОД имя */
+    gap: 2px;                 /* Минимальный зазор между именем и датой */
+}
+
+/* Имя автора ответа */
+.reply-item-username {
+    font-size: 14px;
+    font-weight: 600;         /* Слегка жирный шрифт, чтобы имя выделялось */
+    color: #212529;           /* Насыщенный темный цвет текста */
+    line-height: 1.2;
+}
+
+/* Дата публикации */
+.reply-item-date {
+    font-size: 12px;          /* Дата должна быть визуально меньше имени */
+    color: #868e96;           /* Приглушенный серый цвет */
+    line-height: 1.2;
+}
+
+
+/* Hide значок ответа */
+.reply-status {
+    display: flex;
+    flex-direction: column;
+    width: 18px;
+    height: 18px;
+}
+
+.reply-status-icon {
+    width: 18px;
+    height: 18px;
+}
+
+/* Новый контейнер-обертка, который заберет весь отступ слева */
+.reply-actions {
+    display: flex;
+    align-items: center; /* Выравнивает глаз и троеточие по вертикали */
+    margin-left: auto;   /* Прижимает ВСЮ ГРУППУ (и глаз, и точки) к правому краю */
+    gap: 6px;            /* Расстояние между глазом и троеточием (настройте под себя) */
+}
+
+
+/* Options, 3 точки у ответов */
+.reply-options {
+    display: flex;
+    flex-direction: column;
+    position: relative; /* Это понадобится в будущем, чтобы выпадающее меню не улетало */
+    width: 30px;
+    height: 30px;
+    margin-left: auto;
+    margin-bottom: auto;
+}
+
+.reply-options-btn {
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: #000;
+    font-size: 20px;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+}
+
+.reply-options-btn:hover {
+    background: #ebebeb;
+}
+
+/* == REPLY OPTIONS FORM ==*/
+
+/* 1. Глобальный сброс для форм внутри выпадающего меню */
+.reply-options-form {
+    padding: 0 !important;          
+    margin: 0 !important;           
+    border: none !important;        
+    border-radius: 0 !important;    
+    background: transparent !important; 
+    width: 100% !important;                    
+    display: block !important;                 
+}
+
+/* 2. Единый стиль для ВСЕХ кнопок в меню (и обычной "Изменить", и кнопок в формах) */
+.reply-dropdown-menu .dropdown-item,
+.reply-options-form button.dropdown-item {
+    width: 100% !important;         /* Растягиваем на всю ширину меню */
+    text-align: left !important;    /* Выравниваем текст по левому краю */
+    background: none !important;    /* УНИЧТОЖАЕМ СИНИЙ ФОН, делаем его прозрачным */
+    border: none !important;        /* Убираем рамки */
+    cursor: pointer !important;     /* Добавляем пальчик при наведении */
+    padding: 10px 16px !important;  /* Одинаковые аккуратные отступы для всех */
+    font-size: 14px !important;     
+    font-weight: 500 !important;    
+    color: #333333 !important;      /* Делаем текст "Изменить" и "Скрыть" темно-серым */
+    display: block !important;      /* Выстраиваем их строго друг под друга */
+    box-shadow: none !important;    /* Убираем возможные тени от глобальных кнопок */
+    border-radius: 0 !important;    /* Убираем скругления у самих кнопок, они должны быть прямоугольными внутри меню */
+}
+
+/* 3. Эффект наведения для безопасных пунктов ("Изменить" и "Скрыть") */
+.reply-dropdown-menu .dropdown-item:not(.delete-item):hover,
+.reply-options-form button.dropdown-item:not(.delete-item):hover {
+    background-color: #f1f3f5 !important; /* Приятный светло-серый фон вместо синего */
+    color: #000000 !important;
+}
+
+/* 4. Изолированный стиль для опасной кнопки "Удалить" */
+.reply-dropdown-menu .delete-item,
+.reply-options-form button.delete-item {
+    color: #dc3545 !important;       /* Оставляем четкий красный цвет текста */
+}
+
+/* Эффект наведения на кнопку "Удалить" */
+.reply-dropdown-menu .delete-item:hover,
+.reply-options-form button.delete-item:hover {
+    background-color: #fff5f5 !important; /* Нежный красный фон при наведении */
+}
+
+
+
+
+/* Выпадающее меню */
+.reply-dropdown-menu {
+    /* Самое главное: absolute позиционирует меню относительно родителя (.post-options), 
+       у которого в вашем коде уже написано position: relative; */
+    position: absolute;
+    
+    /* Сдвигаем меню строго под кнопку */
+    top: 100%; 
+    /* Прижимаем к правому краю кнопки, чтобы оно аккуратно выпадало вправо-вниз */
+    right: 0; 
+    
+    /* Стили внешнего вида (как карточка) */
+    background-color: #ffffff;
+    min-width: 150px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Мягкая тень */
+    padding: 6px 0;
+    z-index: 101; /* Перекрывает любые элементы и текст под постом */
+    display: none; 
+}
+
+/* ЭТОТ КЛАСС БУДЕТ ДОБАВЛЯТЬ JAVASCRIPT ПРИ КЛИКЕ */
+.reply-dropdown-menu.show {
+    display: block; /* Показывает меню */
+}
+
+
+
+
+/* --- 2. Тело ответа (Текст сообщения) --- */
+.reply-item-content {
+    font-size: 15px;          /* Комфортный для чтения размер шрифта */
+    color: #333333;           /* Цвет основного текста */
+    line-height: 1.5;         /* Хороший межстрочный интервал, чтобы текст не слипался */
+    padding-left: 50px;       /* Сдвигаем текст вправо, чтобы он начинался ровно под именем, а не под аватаркой */
+    word-break: break-word;   /* Защита от поломки верстки, если пользователь введет очень длинное слово */
+}
+
+.reply-item-content.active {
+    display: flex !important;
+}
+.reply-item-content.hidden {
+    display: none !important;
+}
+
+.reply-read-more, .reply-hide {
+    background: none;
+    border: none;
+    color: #0056b3; /* Синий цвет ссылки */
+    padding: 0;
+    margin-left: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.reply-read-more:hover, .reply-hide:hover {
+    text-decoration: underline; /* Подчеркивание при наведении */
+    background: none;
+}
+
+/* Полный текст комментария изначально полностью скрыт от пользователя */
+.reply-content-full {
+    display: none;
+}
+
+/* Специальный класс-помощник, чтобы жестко спрятать короткий текст при раскрытии */
+.reply-content-short.hidden {
+    display: none !important;
+}
+
+/* Специальный класс-помощник, чтобы жестко показать полный текст при клике */
+.reply-content-full.active {
+    display: block !important;
+}
+
+
+/* --- 3. Подвал ответа (Лайки + Кнопка) --- */
+.reply-item-footer {
+    display: flex;
+    align-items: center;      /* Выравнивает лайки и кнопку «Ответить» на одной горизонтальной линии */
+    gap: 16px;                /* Расстояние между лайками и кнопкой */
+    padding-left: 50px;       /* Тоже сдвигаем вправо в одну линию с текстом */
+    padding-top: 5px;
+}
+
+.reply-item-footer.active {
+    display: flex !important;
+}
+.reply-item-footer.hidden {
+    display: none !important;
+}
+
+/* Блок с лайками */
+.reply-item-footer .likes {
+    font-size: 13px;
+    color: #495057;
+    cursor: default;          
+    
+    /* ИСПРАВЛЕНИЕ: превращаем блок в гибкий контейнер и центрируем эмодзи */
+    display: inline-flex;     
+    align-items: center;      /* Выравнивает сердечко и текст ровно по центру синей рамки */
+    line-height: 1;           /* Сбрасываем лишнюю высоту строки, чтобы убрать пустоту снизу */
+}
+
+
+/* Кнопка «Ответить...» */
+.reply-item-reply {
+    background: none;         /* Убираем дефолтный фон кнопки */
+    border: none;             /* Убираем дефолтную рамку */
+    color: #6c757d;           /* Серый цвет текста */
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;          /* Курсор-пальчик при наведении */
+    padding: 0;               /* Сбрасываем внутренние отступы */
+    transition: color 0.2s ease; /* Плавная анимация цвета */
+    height: 100%;
+}
+
+/* Эффект наведения на кнопку «Ответить» */
+.reply-item-reply:hover {
+    color: #212529;           /* Текст кнопки становится темнее и четче */
+    background: none;
+}
+
+
+
 
 /* === СЕТКА И РАСКЛАДКА === */
 .container {
@@ -533,6 +1456,30 @@ button,
     color: black;
 }
 
+.btn-comment-edit-form {
+    background: none;
+    color: black;
+    padding: 10px 15px;
+}
+
+.btn-reply-edit-form {
+    background: none;
+    color: black;
+    padding: 10px 15px;
+}
+
+.btn-reply-form {
+    background: none;
+    color: black;
+    padding: 10px 15px;
+}
+
+.btn-reply-to-reply-form {
+    background: none;
+    color: black;
+    padding: 10px 15px;
+}
+
 .btn-post-editor {
     width: 100% !important;     /* Кнопка займет всю ширину текстового поля */
     padding: 12px 0 !important; 
@@ -553,5 +1500,21 @@ button:hover,
 }
 
 .btn-comment-form:hover {
+    background: #e2e2e2;
+}
+
+.btn-comment-edit-form:hover {
+    background: #e2e2e2;
+}
+
+.btn-reply-edit-form:hover {
+    background: #e2e2e2;
+}
+
+.btn-reply-form:hover {
+    background: #e2e2e2;
+}
+
+.btn-reply-to-reply-form:hover {
     background: #e2e2e2;
 }

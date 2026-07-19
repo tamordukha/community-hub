@@ -39,7 +39,7 @@
                     {{ post.content }}
                 </div>
                 {% if post.content|length >=300 %}
-                    <a href="{{ url_for('posts.show_post', post_id=post.id) }}" class="read-more">Read more...</a>
+                    <a href="{{ url_for('posts.show_post', post_id=post.id) }}" class="read-more">read more...</a>
                 {% endif %}
                 <div class="post-date">
                     {{ post.created_at }}

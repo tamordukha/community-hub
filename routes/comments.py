@@ -1,5 +1,6 @@
 from flask import Blueprint, request, redirect, url_for, session, abort
 from models.comment import get_comment, add_comment, update_comment, delete_comment, hide_comment
+from models.post import get_post
 from utils.permissions import can_edit_comment, can_delete_comment, can_hide_comment
 
 comments_bp = Blueprint('comments', __name__)
@@ -42,7 +43,7 @@ def edit_comment(post_id, comment_id):
 
 
 @comments_bp.route("/post/<int:post_id>/comment/<int:comment_id>/delete", methods=["POST"])
-def delete_comment_route(post_id, comment_id):
+def del_comment(post_id, comment_id):
     if not session:
         return redirect(url_for("auth.login"))
 
@@ -68,7 +69,9 @@ def toggle_hide_comment(post_id, comment_id):
 
     if comment is None:
         abort(404)
-    if not can_hide_comment(user):
+    post_id = comment["post_id"]
+    post = get_post(post_id)
+    if not can_hide_comment(user, post, comment):
         abort(403)
 
     hide_comment(comment_id)
