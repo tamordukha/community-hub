@@ -57,3 +57,12 @@ CREATE TABLE IF NOT EXISTS comment_likes (
     FOREIGN KEY (comment_id) REFERENCES comments(id),
     UNIQUE(user_id, comment_id)
 );
+
+CREATE TABLE IF NOT EXISTS reply_likes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    reply_id INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (reply_id) REFERENCES replies(id),
+    UNIQUE(user_id, reply_id)
+)
