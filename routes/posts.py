@@ -1,5 +1,6 @@
-from flask import Flask, Blueprint, current_app, render_template, request, redirect, url_for, session, abort
-from models.post import get_posts, get_post, add_post, update_post, delete_post, get_username, get_username, get_posts_with_authors, get_post_with_author
+from flask import Flask, Blueprint, current_app, render_template, request, redirect, url_for, session, abort, jsonify
+from models.post import get_posts, get_post, add_post, update_post, delete_post
+from models.user import get_user_by_id
 from models.comment import get_comments_for_post
 from models.reply import get_replies_for_post, get_replies_count
 
@@ -17,31 +18,36 @@ def index():
             "id": session.get("user_id"),
             "role": session.get("role")
         }
-        current_username = get_username(user["id"])
-    posts = get_posts_with_authors(user)
+        current_username = get_user_by_id(user["id"])["username"]
+    posts = get_posts(user)
+    print(session)
 
     return render_template("posts/index.html", posts=posts, current_username=current_username, show_bottom_bar=True)
 
 
-@posts_bp.route("/post/<int:post_id>")
+@posts_bp.route("/post/<int:post_id>", methods=["GET", "POST"])
 def show_post(post_id):
     if not session:
         user = None
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return jsonify({"error": "Unauthorized"}), 401
     else:
         user = {
             "id": session.get("user_id"),
             "role": session.get("role")
         }
-    post = get_post_with_author(post_id)
+    post = get_post(post_id, user)
     if post is None:
         abort(404)
-    comments = get_comments_for_post(user, post_id)
-    replies = get_replies_for_post(user, post_id)
+    sort = request.form.get("sort-input", "1")
+    print("SORT IN ROUTE:", sort)
+    comments = get_comments_for_post(post_id, user, sort)
+    replies = get_replies_for_post(post_id, user)
     replies_count = get_replies_count(user, post_id)
 
     return render_template(
         "posts/view.html", 
-        post=post, comments=comments, replies=replies, replies_count=replies_count ,user=user,
+        post=post, comments=comments, replies=replies, replies_count=replies_count ,user=user, sort=sort,
         can_edit_post=can_edit_post,
         can_delete_post=can_delete_post, 
         can_edit_comment=can_edit_comment, can_edit_reply=can_edit_reply,

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ user["username"] }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-header-banner"></div>
+    
+    {% if user.id == session.user_id %}
+        <form method="POST" action="{{ url_for('profile.update_avatar', profile_user_id=user.id) }}" enctype="multipart/form-data" class="profile-form">
+            <div class="profile-avatar-wrapper">
+                <img
+                src="{{ url_for('static', filename='uploads/avatars/' + (user.avatar if user.avatar else 'default.png')) }}"
+                class="profile-avatar"
+                >
+                <div class="profile-avatar-overlay">
+                    <img src="{{ url_for('static', filename='icons/camera_icon.png')}}" class="profile-avatar-icon">
+                </div>
+                <input type="file" name="avatar" class="profile-avatar-input" accept="image/*">
+            </div>
+        </form>
+        
+
+    {% else %}
+        <img
+        src="{{ url_for('static', filename='uploads/avatars/' + (user.avatar if user.avatar else 'default.png')) }}"
+        class="profile-avatar guest-view"
+        >
+    {% endif %}
+
+    <div class="profile-info">
+        <span class="profile-username">{{ user.username }}</span>
+        <span class="profile-count-posts"> {{ posts|length }} posts</span>
+    </div>
+
+</div>
+{% if posts %}
+    <h1 class="profile-title">{{ user.username }}'s Blogs</h1>
+    {% for post in posts %}
+        <div class="feed-container">
+            <div class="post-card">
+                <div class="post-main-info">
+                    <div class="post-header">
+                        <img 
+                        src="{{ url_for('static', filename='uploads/avatars/' + (post.author_avatar if post.author_avatar else 'default.png')) }}"
+                        alt="avatar"
+                        class="avatar"
+                        >
+                    </div>
+
+                    <div class="post-title-block">
+                        <a href="{{ url_for('posts.show_post', post_id=post.id) }}" class="post-title"> 
+                            {{ post.title }}
+                        </a>
+
+                        <span class="post-author">
+                            {{ post.author_username }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="post-content">
+                    {{ post.content }}
+                </div>
+                {% if post.content|length >=300 %}
+                    <a href="{{ url_for('posts.show_post', post_id=post.id) }}" class="read-more">read more...</a>
+                {% endif %}
+                <div class="post-date">
+                    {{ post.created_at }}
+                </div>
+
+
+                <form method="POST" action="{{ url_for('likes.like_post') }}" class="post-footer">
+                    <input type="hidden" name="post_id" value="{{ post.id }}">
+                    <input type="hidden" name="redirect_to" value="index">
+                    <button type="submit" class="btn-like">
+                        <img
+                            src="{{ url_for('static', filename='icons/like_active.png' if post.liked_by_current_user else 'icons/like_inactive.png') }}"
+                            class="posts-like-icon"
+                            alt="like"
+                        >
+                        <span class="like-count"> {{ post.like_count if post.like_count else 0 }} </span>
+                    </button>
+                    
+                    <a href="{{ url_for('posts.show_post', post_id=post.id) }}" class="posts-comments">
+                        <img src="{{ url_for('static', filename='icons/comments.png')}}" class="posts-comments-icon">
+                        {{ post.comment_count if post.comment_count else 0 }}
+                    </a>
+                </form>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <h1 class="profile-title">{{ user.username }} have no posts yet...</h1>
+{% endif %}
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/like.js') }}"></script>
+<script src="{{ url_for('static', filename='js/avatar.js') }}"></script>
+{% endblock %}
+
+
+</body>
+</html>

@@ -29,10 +29,16 @@
                             {{ post.title }}
                         </a>
 
-                        <a class="post-author">
+                        <a href="{{ url_for('profile.profile', profile_user_id=post.author_id) }}" class="post-author">
                             {{ post.author_username }}
                         </a>
                     </div>
+
+                    {% if post.is_public == 0 %}
+                        <div class="post-status">
+                            <img src="{{ url_for('static', filename='icons/hide.png') }}" class="post-status-icon">
+                        </div>
+                    {% endif %}
                 </div>
 
                 <div class="post-content">
@@ -45,20 +51,33 @@
                     {{ post.created_at }}
                 </div>
 
-                <div class="post_footer">
-                    <span class="likes">
-                        ❤️ {{ post.like_count if post.like_count else 0 }}
-                    </span>
-                    <a href="{{ url_for('posts.show_post', post_id=post.id) }}" class="comment-link">
-                        💬 {{ post.comment_count if post.comment_count else 0 }}
+
+                <form method="POST" action="{{ url_for('likes.like_post') }}" class="post-footer">
+                    <input type="hidden" name="post_id" value="{{ post.id }}">
+                    <input type="hidden" name="redirect_to" value="index">
+                    <button type="submit" class="btn-like">
+                        <img
+                            src="{{ url_for('static', filename='icons/like_active.png' if post.liked_by_current_user else 'icons/like_inactive.png') }}"
+                            class="posts-like-icon"
+                            alt="like"
+                        >
+                        <span class="like-count"> {{ post.like_count if post.like_count else 0 }} </span>
+                    </button>
+                    
+                    <a href="{{ url_for('posts.show_post', post_id=post.id) }}" class="posts-comments">
+                        <img src="{{ url_for('static', filename='icons/comments.png')}}" class="posts-comments-icon">
+                        {{ post.comment_count if post.comment_count else 0 }}
                     </a>
-                </div>
+                </form>
             </div>
         </div>
     {% endfor %}
 {% else %}
     <p>No posts yet.</p>
 {% endif %}
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/like.js') }}"></script>
 {% endblock %}
 
 

@@ -17,7 +17,7 @@
                 alt="avatar"
                 class="navbar-avatar"
             >
-            <span class="navbar-username">{{ session.username }}</span>
+            <a  href="{{ url_for('profile.profile', profile_user_id=session.user_id) }}" class="navbar-username">{{ session.username }}</a>
         {% else %}
             <img
                 src="{{ url_for('static', filename='uploads/avatars/default.png') }}"

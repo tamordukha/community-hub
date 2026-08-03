@@ -63,3 +63,11 @@ def get_user_by_id(user_id):
     conn.close()
 
     return dict(user) if user else None
+
+def update_user_avatar(user_id, filename):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("UPDATE users SET avatar = ? WHERE id = ?", (filename, user_id),)
+    conn.commit()
+    conn.close()

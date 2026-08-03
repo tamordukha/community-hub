@@ -20,21 +20,40 @@ from models.user import get_user_by_id
 8) Выдать число ответов get_replies_count
 '''
 
-def get_replies_for_post(user, post_id):
+def get_replies_for_post(post_id, user=None):
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute(
-        """
-        SELECT r.*, u.username, u.avatar
-        FROM replies r
-        JOIN users u ON u.id = r.author_id
-        JOIN comments c ON r.comment_id = c.id
-        WHERE c.post_id = ?
-        ORDER BY r.created_at ASC
-        """,
-        (post_id,),
-    )
+    if user:
+        cursor.execute(
+            """
+            SELECT
+                r.*, u.username, u.avatar,
+                (SELECT COUNT(*) FROM reply_likes WHERE reply_id = r.id) AS like_count,
+                (SELECT COUNT(*) FROM reply_likes WHERE reply_id = r.id AND user_id = :user_id) AS liked_by_current_user
+            FROM replies r
+            JOIN users u ON u.id = r.author_id
+            JOIN comments c ON r.comment_id = c.id
+            WHERE c.post_id = :post_id
+            ORDER BY c.created_at ASC
+            """,
+            {"post_id": post_id, "user_id": user["id"]}
+        )
+
+    else:
+        cursor.execute(
+            """
+            SELECT
+                r.*, u.username, u.avatar,
+                (SELECT COUNT(*) FROM reply_likes WHERE reply_id = r.id) AS like_count
+            FROM replies r
+            JOIN users u ON u.id = r.author_id
+            JOIN comments c ON r.comment_id = c.id
+            WHERE c.post_id = :post_id
+            ORDER BY c.created_at ASC
+            """,
+            {"post_id": post_id}
+        )
 
     replies = cursor.fetchall()
     conn.close()
@@ -126,7 +145,7 @@ def hide_reply(reply_id):
     conn.close()
 
 def get_replies_count(user, post_id):
-    replies = get_replies_for_post(user, post_id)
+    replies = get_replies_for_post(post_id, user)
     replies_count = {}
     
     for comment_id, list_replies in replies.items():

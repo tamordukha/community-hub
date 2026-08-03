@@ -26,26 +26,32 @@
                     {{ post.title }}
                 </span>
 
-                <span class="post-author">
+                <a href="{{ url_for('profile.profile', profile_user_id=post.author_id) }}" class="post-author">
                     {{ post.author_username }}
-                </span>
+                </a>
             </div>
 
-            {% if can_delete_post(user,post) %}
-            <form method="POST" action="{{ url_for('posts.del_post', post_id=post.id) }}" class="post-options-form" onsubmit="return confirm('Удалить этот пост?')">
-                <div class="post-options">
-                    <button type="button" class="post-options-btn" id="post-menu-trigger">⋮</button>
-
-                    <div class="post-dropdown-menu" id="post-dropdown-menu">
-                        {% if can_edit_post(user, post)%}
-                            <a href="{{ url_for('posts.edit_post', post_id=post.id) }}" class="dropdown-item">Изменить</a>
-                        {% endif %}
-                            <button type="submit" class="dropdown-item delete-item">Удалить</button>
+            <div class="post-actions">    
+                {% if post.is_public == 0 %}
+                    <div class="post-status">
+                        <img src="{{ url_for('static', filename='icons/hide.png') }}" class="post-status-icon">
                     </div>
-                </div>
-            </form>
+                {% endif %}
+                {% if can_delete_post(user,post) %}
+                <form method="POST" action="{{ url_for('posts.del_post', post_id=post.id) }}" class="post-options-form" onsubmit="return confirm('Удалить этот пост?')">
+                    <div class="post-options">
+                        <button type="button" class="post-options-btn" id="post-menu-trigger">⋮</button>
 
-            {% endif %}
+                        <div class="post-dropdown-menu" id="post-dropdown-menu">
+                            {% if can_edit_post(user, post)%}
+                                <a href="{{ url_for('posts.edit_post', post_id=post.id) }}" class="dropdown-item">Изменить</a>
+                            {% endif %}
+                                <button type="submit" class="dropdown-item delete-item">Удалить</button>
+                        </div>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
         </div>
 
         <div class="post-detail-content">
@@ -67,22 +73,33 @@
             {{ post.created_at }}
         </div>
 
-        <div class="post_footer">
-            <span class="likes">
-                ❤️ {{ post.like_count if post.like_count else 0 }}
-            </span>
-            <a href="{{ url_for('posts.show_post', post_id=post.id) }}" class="comment-link">
-                💬 {{ post.comment_count if post.comment_count else 0 }}
+        <form method="POST" action="{{ url_for('likes.like_post') }}" class="post-footer">
+            <input type="hidden" name="post_id" value="{{ post.id }}">
+            <input type="hidden" name="redirect_to" value="post">
+            <button type="submit" class="btn-like">
+                <img
+                    src="{{ url_for('static', filename='icons/like_active.png' if post.liked_by_current_user else 'icons/like_inactive.png') }}"
+                    class="posts-like-icon"
+                    alt="like"
+                >
+                <span class="like-count"> {{ post.like_count if post.like_count else 0 }} </span>
+            </button>
+            
+            <a href="{{ url_for('posts.show_post', post_id=post.id) }}" class="posts-comments">
+                <img src="{{ url_for('static', filename='icons/comments.png')}}" class="posts-comments-icon">
+                {{ post.comment_count if post.comment_count else 0 }}
             </a>
-        </div>
+        </form>
 
         <div class="comments">
             <div class="comments-header">
                 <h3>{{ comments|length }} Комментариев</h3>
-                <select name="sort" id="sort">
-                    <option value="1" selected>Недавнее</option>
-                    <option value="0">Популярное</option>
-                </select>
+                <form method="POST" class="comment-sort-form">
+                    <input type="hidden" name="sort-input" id="sort-input" value="{{ sort }}">
+                    
+                    <button type="submit" class="sort-btn {{ 'active' if sort == '1' else '' }}" data-value="1">Недавнее</button>
+                    <button type="submit" class="sort-btn {{ 'active' if sort == '0' else '' }}" data-value="0">По популярности</button>          
+                </form>
             </div>
 
             {% if session %}
@@ -114,7 +131,7 @@
                             class="comment-item-avatar"
                             >
                             <div class="comment-item-main-info">
-                                <span class="comment-item-username"> {{ comment.username }} </span>
+                                <a href="{{ url_for('profile.profile', profile_user_id=comment.author_id) }}" class="comment-item-username"> {{ comment.username }} </a>
                                 <span class="comment-item-date"> {{ comment.created_at }} </span>
                             </div>
 
@@ -172,14 +189,22 @@
                         </div>
 
                         <!-- Основной слой, скрывается когда изменяешь комментарий -->
-                        <div class="comment-item-footer">
-                            <span class="likes">
-                                ❤️ {{ comment.like_count if comment.like_count else 0 }}
-                            </span>
+                        <form method="POST" action="{{ url_for('likes.like_comment') }}" class="comment-item-footer">
+                            <input type="hidden" name="post_id" value="{{ post.id }}">
+                            <input type="hidden" name="comment_id" value="{{ comment.id }}">
+                            <button type="submit" class="btn-comment-like">
+                                <img
+                                    src="{{ url_for('static', filename='icons/like_active.png' if comment.liked_by_current_user else 'icons/like_inactive.png') }}"
+                                    class="comment-like-icon"
+                                    alt="like"
+                                >
+                                <span class="comment-like-count"> {{ comment.like_count if comment.like_count else 0 }} </span>
+                            </button>
+
                             {% if session %}
                                 <button type="button" class="comment-item-reply">Ответить...</button>
                             {% endif %}
-                        </div>
+                        </form>
 
                         
                         <div class="comment-edit-form hidden">
@@ -234,9 +259,13 @@
 
                                         <div class="reply-item-main-info">
                                             {% if reply.parent_reply_id %}
-                                                <span class="reply-item-username"> {{ reply.username }} -> {{ reply.parent_reply_username }}</span>
+                                                <a href="{{ url_for('profile.profile', profile_user_id=reply.author_id) }}" class="reply-item-username"> 
+                                                    {{ reply.username }} -> {{ reply.parent_reply_username }}
+                                                </a>
                                             {% else %}
-                                                <span class="reply-item-username"> {{ reply.username }} </span>
+                                                <a href="{{ url_for('profile.profile', profile_user_id=reply.author_id) }}" class="reply-item-username">
+                                                    {{ reply.username }}
+                                                </a>
                                             {% endif %}
                                             <span class="reply-item-date"> {{ reply.created_at }} </span>
                                         </div>
@@ -293,14 +322,24 @@
                                         {% endif %}
                                     </div>
 
-                                    <div class="reply-item-footer">
-                                        <span class="likes">
-                                            ❤️ {{ reply.like_count if reply.like_count else 0 }}
-                                        </span>
+
+                                    <form method="POST" action="{{ url_for('likes.like_reply') }}" class="reply-item-footer">
+                                        <input type="hidden" name="post_id" value="{{ post.id }}">
+                                        <input type="hidden" name="reply_id" value="{{ reply.id }}">
+                                        <button type="submit" class="btn-reply-like">
+                                            <img
+                                                src="{{ url_for('static', filename='icons/like_active.png' if reply.liked_by_current_user else 'icons/like_inactive.png') }}"
+                                                class="reply-like-icon"
+                                                alt="like"
+                                            >
+                                            <span class="reply-like-count"> {{ reply.like_count if reply.like_count else 0 }} </span>
+                                        </button>
+
                                         {% if session %}
                                             <button type="button" class="reply-item-reply">Ответить...</button>
                                         {% endif %}
-                                    </div>
+                                    </form>
+
 
                                     <div class="reply-edit-form hidden">
                                         <form method="POST" action="{{ url_for('replies.edit_reply', post_id=post.id, comment_id=comment.id, reply_id=reply.id) }}">
@@ -354,6 +393,7 @@
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/view.js') }}"></script>
+<script src="{{ url_for('static', filename='js/like.js') }}"></script>
 {% endblock %}
 </body>
 </html>

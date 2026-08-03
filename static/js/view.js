@@ -289,20 +289,23 @@ const commentInput = document.getElementById('comment-input');
 const commentSubmit = document.getElementById('comment-submit');
 const commentCancel = document.getElementById('comment-cancel');
 
-// Логика блокировки/активации кнопки отправки при вводе текста
-commentInput.addEventListener('input', function() {
-    if (commentInput.value.trim().length > 0) {
-        commentSubmit.removeAttribute('disabled');
-    } else {
-        commentSubmit.setAttribute('disabled', 'true');
-    }
-});
+if (commentInput && commentCancel && commentSubmit){
+    // Логика блокировки/активации кнопки отправки при вводе текста
+    commentInput.addEventListener('input', function() {
+        if (commentInput.value.trim().length > 0) {
+            commentSubmit.removeAttribute('disabled');
+        } else {
+            commentSubmit.setAttribute('disabled', 'true');
+        }
+    });
 
-// Логика очистки текста по клику на «Отмена»
-commentCancel.addEventListener('click', function() {
-    commentInput.value = ''; 
-    commentSubmit.setAttribute('disabled', 'true'); 
-});
+    // Логика очистки текста по клику на «Отмена»
+    commentCancel.addEventListener('click', function() {
+        commentInput.value = ''; 
+        commentSubmit.setAttribute('disabled', 'true'); 
+    });
+}
+
 
 
 
@@ -685,3 +688,24 @@ toggleReplyButton.forEach(button => {
         }
     });
 });
+
+
+// функция СОРТИРОВКИ КОММЕНТАРИЕВ 
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const sortButtons = document.querySelectorAll('.sort-btn');
+    const sortInput = document.getElementById('sort-input');
+
+    sortButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            sortButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            const chosenValue = this.getAttribute('data-value');
+            sortInput.value = chosenValue;
+            this.closest('form').submit();
+        });
+    });
+});
+
+

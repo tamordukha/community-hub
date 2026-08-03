@@ -11,21 +11,38 @@ from models.post import get_post
 6) Скрыть комментарий к посту hide_comment
 '''
 
-def get_comments_for_post(user, post_id):
+def get_comments_for_post(post_id, user=None, sort=1):
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute(
-        """
-        SELECT c.*, u.username, u.avatar
-        FROM comments c
-        JOIN users u ON u.id = c.author_id
-        WHERE c.post_id = ?
-        ORDER BY c.created_at ASC
-        """,
-        (post_id,),
-    )
-
+    sort = int(sort) if sort else 1
+    order_by = "c.created_at DESC" if sort == 1 else "like_count DESC"
+    if user:
+        cursor.execute(
+            """
+            SELECT
+                c.*, u.username, u.avatar,
+                (SELECT COUNT(*) FROM comment_likes WHERE comment_id = c.id) AS like_count,
+                (SELECT COUNT(*) FROM comment_likes WHERE comment_id = c.id AND user_id = :user_id) AS liked_by_current_user
+            FROM comments c
+            JOIN users u ON u.id = c.author_id
+            WHERE c.post_id = :post_id
+            ORDER BY """ + order_by,
+            {"post_id": post_id, "user_id": user["id"]}
+        )
+    else:
+        cursor.execute(
+            """
+            SELECT
+                c.*, u.username, u.avatar,
+                (SELECT COUNT(*) FROM comment_likes WHERE comment_id = c.id) AS like_count
+            FROM comments c
+            JOIN users u ON u.id = c.author_id
+            WHERE c.post_id = :post_id
+            ORDER BY """ + order_by,
+            {"post_id": post_id}
+        )
+    
     comments = cursor.fetchall()
     conn.close()
 

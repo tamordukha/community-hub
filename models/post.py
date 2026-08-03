@@ -3,30 +3,90 @@ from database.db import get_connection
 from utils.permissions import can_view_post
 
 
-def get_posts(user=None):
-    conn = get_connection()
-    cursor = conn.cursor()
+def get_posts(user=None, profile_user_id=0):
+    with get_connection() as conn:
+        cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM posts ORDER BY created_at DESC")
-    posts = cursor.fetchall()
-    conn.close()
+        if user:
+            query = """
+                SELECT 
+                    p.*, u.username AS author_username, u.avatar AS author_avatar,
+                    (SELECT COUNT(*) FROM post_likes WHERE post_id = p.id) AS like_count,
+                    (SELECT COUNT(*) FROM post_likes WHERE post_id = p.id AND user_id = ?) AS liked_by_current_user,
+                    (
+                        (SELECT COUNT(*) FROM comments WHERE post_id = p.id) + 
+                        (SELECT COUNT(*) FROM replies WHERE comment_id IN (SELECT id FROM comments WHERE post_id = p.id))
+                    ) AS comment_count
+                FROM posts p
+                JOIN users u ON u.id = p.author_id
+                ORDER BY p.created_at DESC
+            """
+            cursor.execute(query, (user["id"],))
+        else:
+            query = """
+                SELECT 
+                    p.*, u.username AS author_username, u.avatar AS author_avatar,
+                    (SELECT COUNT(*) FROM post_likes WHERE post_id = p.id) AS like_count,
+                    (
+                        (SELECT COUNT(*) FROM comments WHERE post_id = p.id) + 
+                        (SELECT COUNT(*) FROM replies WHERE comment_id IN (SELECT id FROM comments WHERE post_id = p.id))
+                    ) AS comment_count
+                FROM posts p
+                JOIN users u ON u.id = p.author_id
+                ORDER BY p.created_at DESC
+            """
+            cursor.execute(query)
+        posts = cursor.fetchall()
 
-    posts = [dict(p) for p in posts]
+    posts_dicts = [dict(p) for p in posts]
 
-    visible_posts = [p for p in posts if can_view_post(user, p)]
+    if profile_user_id:
+        visible_posts = [p for p in posts_dicts if can_view_post(user, p) and p["author_id"]==profile_user_id]
+    else:
+        visible_posts = [p for p in posts_dicts if can_view_post(user, p)]
 
     return visible_posts
 
 
-def get_post(post_id):
-    conn = get_connection()
-    cursor = conn.cursor()
+def get_post(post_id, user=None):
+    with get_connection() as conn:
+        cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM posts WHERE id = ?", (post_id,))
-    post = cursor.fetchone()
-    conn.close()
+        if user:
+            query = """
+                SELECT 
+                    p.*, u.username AS author_username, u.avatar AS author_avatar,
+                    (SELECT COUNT(*) FROM post_likes WHERE post_id = p.id) AS like_count,
+                    (SELECT COUNT(*) FROM post_likes WHERE post_id = p.id AND user_id = :user_id) AS liked_by_current_user,
+                    (
+                        (SELECT COUNT(*) FROM comments WHERE post_id = p.id) + 
+                        (SELECT COUNT(*) FROM replies WHERE comment_id IN (SELECT id FROM comments WHERE post_id = p.id))
+                    ) AS comment_count
+                FROM posts p
+                JOIN users u ON u.id = p.author_id
+                WHERE p.id = :post_id
+            """
+            cursor.execute(query, {"post_id": post_id, "user_id": user["id"]})
+        else:
+            query = """
+                SELECT 
+                    p.*, u.username AS author_username, u.avatar AS author_avatar,
+                    (SELECT COUNT(*) FROM post_likes WHERE post_id = p.id) AS like_count,
+                    (
+                        (SELECT COUNT(*) FROM comments WHERE post_id = p.id) + 
+                        (SELECT COUNT(*) FROM replies WHERE comment_id IN (SELECT id FROM comments WHERE post_id = p.id))
+                    ) AS comment_count
+                FROM posts p
+                JOIN users u ON u.id = p.author_id
+                WHERE p.id = :post_id
+            """
+            cursor.execute(query, {"post_id": post_id})
+        post = cursor.fetchone()
 
-    return dict(post) if post else None
+    if post is None:
+        return None
+    post = dict(post)
+    return post
 
 
 def add_post(user_id, title, content, is_public):
@@ -60,54 +120,3 @@ def delete_post(post_id):
     cursor.execute("DELETE FROM posts WHERE id = ?", (post_id,))
     conn.commit()
     conn.close()
-
-
-def get_username(user_id):
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT username FROM users WHERE id = ?", (user_id,))
-    user = cursor.fetchone()
-    conn.close()
-
-    return user["username"] if user else None
-
-
-def get_posts_with_authors(user=None):
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    cursor.execute(
-        """
-        SELECT p.*, u.username AS author_username, u.avatar AS author_avatar
-        FROM posts p
-        JOIN users u ON u.id = p.author_id
-        ORDER BY p.created_at DESC
-        """
-    )
-    posts = cursor.fetchall()
-    conn.close()
-
-    posts = [dict(p) for p in posts]
-
-    visible_posts = [p for p in posts if can_view_post(user, p)]
-
-    return visible_posts
-
-def get_post_with_author(post_id):
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    cursor.execute(
-        """
-        SELECT p.*, u.username AS author_username, u.avatar AS author_avatar
-        FROM posts p
-        JOIN users u ON u.id = p.author_id
-        WHERE p.id = ?
-        """,
-        (post_id,)
-    )
-    post = cursor.fetchone()
-    conn.close()
-
-    return dict(post) if post else None

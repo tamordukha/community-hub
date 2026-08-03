@@ -149,6 +149,20 @@ main {
     text-decoration: underline;
 }
 
+/* Hide значок поста */
+.post-status {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    width: 22px;
+    height: 22px;
+}
+
+.post-status-icon {
+    width: 22px;
+    height: 22px;
+}
+
 /* Контент */
 .post-content {
     max-height: 4.5em;
@@ -180,15 +194,53 @@ main {
 
 /* Нижняя строка: лайки и комментарии */
 .post-footer {
+    margin: 0px;
+    padding: 0px;
     display: flex;
-    gap: 15px;
-    font-size: 14px;
+    gap: 13px;
+    font-size: 17px;
+    border: none;
+    height: 25px;
+    
 }
 
 .comment-link {
     color: #555;
 }
 
+.btn-like {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    background: none;
+    color: #000;
+    width: 32px;
+    height: 100%;
+}
+
+.btn-like:hover {
+    background: none;
+}
+
+.posts-like-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.like-count {
+    font-size: 17px;
+}
+
+.posts-comments {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.posts-comments-icon {
+    width: 18px;
+    height: 18px;
+}
 
 /* =====СТРАНИЦА 1 ПОСТА===== */
 
@@ -202,13 +254,30 @@ main {
 }
 
 
-.post-container .post-title {
-    font-size: 24px;
-}
-
-
 .post-container .post-author {
     font-size: 19px;
+}
+
+/* Hide значок поста */
+.post-container .post-status {
+    display: flex;
+    flex-direction: column;
+    width: 30px;
+    height: 30px;
+    margin-left: 0;
+    margin-bottom: 0;
+}
+
+.post-container .post-status-icon {
+    width: 30px;
+    height: 30px;
+}
+
+.post-actions {
+    display: flex;
+    align-items: center; /* Выравнивает глаз и троеточие по вертикали */
+    margin-left: auto;   /* Прижимает ВСЮ ГРУППУ (и глаз, и точки) к правому краю */
+    gap: 6px;            /* Расстояние между глазом и троеточием (настройте под себя) */
 }
 
 .post-options {
@@ -360,7 +429,31 @@ main {
 
 /* Нижняя строка: лайки и комментарии */
 .post-container .post-footer {
+    padding-top: 5px;
+    padding-bottom: 10px;
     font-size: 21px;
+    gap: 18px;
+}
+
+.post-container .btn-like {
+    gap: 7px;
+}
+
+.post-container .posts-like-icon {
+    width: 21px;
+    height: 21px;
+}
+
+.post-container .like-count {
+    font-size: 21px;
+}
+
+.post-container .posts-comments {
+    gap: 7px;
+}
+.post-container .posts-comments-icon {
+    width: 21px;
+    height: 21px;
 }
 
 /* ===== Create post =====*/
@@ -415,6 +508,7 @@ main {
     background: none !important;
 }
 
+
 /* Кнопка создания поста */
 
 .post-editor-form-actions {
@@ -432,8 +526,7 @@ main {
 
 /* ===== COMMENTS LIST ===== */
 .comments {
-    margin-top: 30px;
-    padding-top: 20px;
+    margin-top: 20px;
     border-top: 1px solid #ddd;
 }
 
@@ -442,12 +535,54 @@ main {
     justify-content: space-between; 
     align-items: center;      /* Теперь это свойство сработает идеально ровно по центру */
     padding: 10px 0;          /* Добавит по 10px свободного места сверху и снизу */
-    margin-bottom: 20px;      
+    margin-bottom: 15px;      
 }
 
 .comments-header h3 {
     margin: 0; /* Убирает невидимые отступы браузера, которые ломают выравнивание */
 }
+
+
+/* СОРТИРОВКА КОММЕНТАРИЕВ */
+.comment-sort-form {
+    display: inline-flex;       /* Сжимает контейнер по размеру кнопок */
+    margin-top: 20px;
+    background-color: #f1f3f5;  /* Светло-серый фон плашки */
+    padding: 4px;               /* Внутренний отступ, чтобы кнопки не прилипали к краям */
+    border-radius: 8px;        /* Скругление общей рамки */
+}
+
+/* Общие стили для обеих кнопок переключателя */
+.sort-btn {
+    background: none;
+    border: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #495057;             /* Серый цвет текста для неактивной кнопки */
+    cursor: pointer;
+    border-radius: 6px;        /* Внутреннее скругление кнопок */
+    transition: all 0.2s ease;  /* Плавный переход цвета при клике */
+}
+
+/* Стили для АКТИВНОЙ кнопки (на которую нажали) */
+.sort-btn.active {
+    background-color: #ffffff;  /* Белый фон */
+    color: #212529;             /* Темный текст */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); /* Легкая тень, приподнимающая кнопку */
+}
+
+/* Эффект наведения только на неактивную кнопку */
+.sort-btn:not(.active):hover {
+    color: #000000;
+}
+
+/* На всякий случай фиксируем, чтобы в обычном состоянии у неактивной кнопки не выскакивал фон */
+.sort-btn:not(.active) {
+    background: none !important;
+}
+
+
 
 /* ==== КОММЕНТАРИЙ ==== */
 
@@ -709,10 +844,14 @@ main {
 
 /* --- 3. Подвал комментария (Лайки + Кнопка) --- */
 .comment-item-footer {
+    margin: 0px;
+    padding: 0px;
     display: flex;
-    align-items: center;      /* Выравнивает лайки и кнопку «Ответить» на одной горизонтальной линии */
-    gap: 16px;                /* Расстояние между лайками и кнопкой */
-    padding-left: 50px;       /* Тоже сдвигаем вправо в одну линию с текстом */
+    align-items: center;
+    gap: 16px;
+    border: none;
+    height: 25px;
+    padding-left: 50px;
     padding-top: 5px;
 }
 
@@ -724,16 +863,31 @@ main {
 }
 
 /* Блок с лайками */
-.comment-item-footer .likes {
-    font-size: 13px;
-    color: #495057;
-    cursor: default;          
-    
-    /* ИСПРАВЛЕНИЕ: превращаем блок в гибкий контейнер и центрируем эмодзи */
-    display: inline-flex;     
-    align-items: center;      /* Выравнивает сердечко и текст ровно по центру синей рамки */
-    line-height: 1;           /* Сбрасываем лишнюю высоту строки, чтобы убрать пустоту снизу */
+.btn-comment-like {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    background: none;
+    color: #000;
+    width: 32px;
+    height: 100%;
 }
+
+.btn-comment-like:hover {
+    background: none;
+}
+
+.comment-like-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.comment-like-count {
+    font-size: 15px;
+}
+
+
 
 
 /* Кнопка «Ответить...» */
@@ -782,7 +936,7 @@ main {
     flex-direction: column; /* Элементы внутри (верхний ряд и нижний ряд) встанут строго друг под друга */
     gap: 12px;              /* Расстояние между верхним и нижним рядом */
     width: 100%;            /* Блок растягивается на всю ширину родительского контейнера */
-    margin-bottom: 25px;    /* Отступ снизу, чтобы готовые комментарии не прижимались */
+    margin-bottom: 20px;    /* Отступ снизу, чтобы готовые комментарии не прижимались */
 }
 
 .comment-form-main {
@@ -1305,10 +1459,15 @@ main {
 
 /* --- 3. Подвал ответа (Лайки + Кнопка) --- */
 .reply-item-footer {
+    margin: 0px;
+    padding: 0px;
     display: flex;
-    align-items: center;      /* Выравнивает лайки и кнопку «Ответить» на одной горизонтальной линии */
-    gap: 16px;                /* Расстояние между лайками и кнопкой */
-    padding-left: 50px;       /* Тоже сдвигаем вправо в одну линию с текстом */
+    align-items: center;
+    background: #f5f5f5;
+    gap: 16px;
+    border: none;
+    height: 25px;
+    padding-left: 50px;
     padding-top: 5px;
 }
 
@@ -1320,16 +1479,31 @@ main {
 }
 
 /* Блок с лайками */
-.reply-item-footer .likes {
-    font-size: 13px;
-    color: #495057;
-    cursor: default;          
-    
-    /* ИСПРАВЛЕНИЕ: превращаем блок в гибкий контейнер и центрируем эмодзи */
-    display: inline-flex;     
-    align-items: center;      /* Выравнивает сердечко и текст ровно по центру синей рамки */
-    line-height: 1;           /* Сбрасываем лишнюю высоту строки, чтобы убрать пустоту снизу */
+.btn-reply-like {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    background: none;
+    color: #000;
+    width: 32px;
+    height: 100%;
 }
+
+.btn-reply-like:hover {
+    background: none;
+}
+
+.reply-like-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.reply-like-count {
+    font-size: 15px;
+}
+
+
 
 
 /* Кнопка «Ответить...» */
@@ -1352,6 +1526,123 @@ main {
 }
 
 
+
+/* ====================== USER PROFILE ====================== */
+.profile-container {
+    max-width: 650px;
+    margin: 20px auto;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 20px;
+    position: relative; /* Важно для позиционирования элементов внутри */
+    overflow: hidden;    /* Чтобы углы серой шапки скруглялись по границе контейнера */
+}
+
+/* Новый стиль для серой шапки */
+.profile-header-banner {
+    width: 100%;
+    height: 80px;          /* Высота шапки, можно настроить под себя */
+    background-color: #e0e0e0; /* Серый цвет фона */
+}
+
+.profile-form {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    
+    border: 6px solid #fff; /* Белая рамка вокруг аватара, как в соцсетях */
+}
+
+.profile-avatar.guest-view {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    display: block;
+    margin-top: -50px;   /* Сдвигаем аватарку наполовину вверх, чтобы она заходила на шапку */ 
+    border: 6px solid #fff; /* Белая рамка вокруг аватара, как в соцсетях */
+    position: relative;     /* Чтобы аватар отображался поверх шапки */
+}
+
+.profile-avatar-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 112px;
+    height: 112px;
+    border-radius: 50%; 
+    margin-top: -50px;
+    cursor: pointer;   /* ← Чтобы было видно, что кликабельно */
+    z-index: 2;
+}
+
+.profile-avatar-overlay {
+    position: absolute;
+    top: 6px;     /* ← Сдвиг из-за белой рамки (4px) */
+    left: 6px;
+    width: 100px;
+    height: 100px;
+    background: rgba(0, 0, 0, 0.5); /* затемнение */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0; /* скрыт по умолчанию */
+    transition: opacity 0.2s ease; /* плавность */
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.profile-avatar-icon {
+    width: 50px;
+    height: 50px;
+    filter: invert(1); /* если иконка белая */
+}
+
+.profile-avatar-wrapper:hover .profile-avatar-overlay {
+    opacity: 1; /* при наведении появляется */
+}
+
+.profile-avatar-input {
+    display: none;
+}
+
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+}
+
+
+.profile-username {
+    font-size: 25px;
+}
+
+.profile-count-posts {
+    font-size: 15px;
+    color: #a5a5a5;
+}
+
+.profile-title {
+    font-size: 25px;
+    text-align: center;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
 
 
 /* === СЕТКА И РАСКЛАДКА === */
