@@ -10,7 +10,7 @@ posts_bp = Blueprint('posts', __name__)
 
 @posts_bp.route("/")
 def index():
-    if not session:
+    if not session.get("user_id"):
         user = None
         current_username = None
     else:
@@ -27,7 +27,7 @@ def index():
 
 @posts_bp.route("/post/<int:post_id>", methods=["GET", "POST"])
 def show_post(post_id):
-    if not session:
+    if not session.get("user_id"):
         user = None
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
             return jsonify({"error": "Unauthorized"}), 401
@@ -58,7 +58,7 @@ def show_post(post_id):
 
 @posts_bp.route("/post/create", methods=["GET", "POST"])
 def create_post():
-    if "user_id" not in session:
+    if not session.get("user_id"):
         return redirect(url_for("auth.login"))
     user_id = session["user_id"]
 

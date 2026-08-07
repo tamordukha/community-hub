@@ -15,6 +15,7 @@
     
     {% if user.id == session.user_id %}
         <form method="POST" action="{{ url_for('profile.update_avatar', profile_user_id=user.id) }}" enctype="multipart/form-data" class="profile-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="profile-avatar-wrapper">
                 <img
                 src="{{ url_for('static', filename='uploads/avatars/' + (user.avatar if user.avatar else 'default.png')) }}"
@@ -39,6 +40,7 @@
             {{ user.username }}
             {% if can_modify_role(current_user, user) %}
                 <form method="POST" action="{{ url_for('profile.change_role', profile_user_id=user.id) }}" class="profile-role-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="button" class="button-role" id="button-role">
                         <img src="{{ url_for('static', filename='icons/' + user.role + '_icon.png')}}" class="user-role-icon">
                     </button>
@@ -111,6 +113,8 @@
 
 
                 <form method="POST" action="{{ url_for('likes.like_post') }}" class="post-footer">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
                     <input type="hidden" name="post_id" value="{{ post.id }}">
                     <input type="hidden" name="redirect_to" value="index">
                     <button type="submit" class="btn-like">

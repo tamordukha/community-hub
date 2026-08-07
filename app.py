@@ -1,12 +1,13 @@
 from flask import Flask
 from config import Config
 from database.db import init_db
+from flask_wtf.csrf import CSRFProtect
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     init_db()
-
+    CSRFProtect(app)
     register_routes(app)
     return app
 

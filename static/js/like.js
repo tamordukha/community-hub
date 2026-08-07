@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 method: "POST",
                 headers: {
                     "X-Requested-With": "XMLHttpRequest",
+                    "X-CSRFToken": document.querySelector('input[name="csrf_token"]').value,
                 },
                 body: formData,
             })
@@ -53,6 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 method: "POST",
                 headers: {
                     "X-Requested-With": "XMLHttpRequest",
+                    "X-CSRFToken": document.querySelector('input[name="csrf_token"]').value,
                 },
                 body: formData,
             })
@@ -93,6 +95,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 method: "POST",
                 headers: {
                     "X-Requested-With": "XMLHttpRequest",
+                    "X-CSRFToken": document.querySelector('input[name="csrf_token"]').value,
                 },
                 body: formData,
             })

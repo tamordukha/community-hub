@@ -8,7 +8,7 @@ replies_bp = Blueprint('replies', __name__)
 
 @replies_bp.route("/post/<int:post_id>/<int:comment_id>/reply/create", methods=["POST"])
 def create_reply(post_id, comment_id):
-    if not session:
+    if not session.get("user_id"):
         return redirect(url_for("auth.login"))
 
     content = request.form.get("content")
@@ -23,7 +23,7 @@ def create_reply(post_id, comment_id):
 
 @replies_bp.route("/post/<int:post_id>/<int:comment_id>/reply/<int:parent_reply_id>/reply-to-reply", methods=["POST"])
 def create_reply_to_reply(post_id, comment_id, parent_reply_id):
-    if not session:
+    if not session.get("user_id"):
         return redirect(url_for("auth.login"))
 
     content = request.form.get("content")
@@ -38,7 +38,7 @@ def create_reply_to_reply(post_id, comment_id, parent_reply_id):
 
 @replies_bp.route("/post/<int:post_id>/reply/<int:reply_id>/edit", methods=["POST"])
 def edit_reply(post_id, reply_id):
-    if not session:
+    if not session.get("user_id"):
         return redirect(url_for("auth.login"))
 
     user = {"id": session["user_id"], "role": session["role"]}
@@ -59,7 +59,7 @@ def edit_reply(post_id, reply_id):
 
 @replies_bp.route("/post/<int:post_id>/reply/<int:reply_id>/delete", methods=["POST"])
 def del_reply(post_id, reply_id):
-    if not session:
+    if not session.get("user_id"):
         return redirect(url_for("auth.login"))
 
     user = {"id": session["user_id"], "role": session["role"]}
@@ -76,7 +76,7 @@ def del_reply(post_id, reply_id):
 
 @replies_bp.route("/post/<int:post_id>/reply/<int:reply_id>/hide", methods=["POST"])
 def toggle_hide_reply(post_id, reply_id):
-    if not session:
+    if not session.get("user_id"):
         return redirect(url_for("auth.login"))
 
     user = {"id": session["user_id"], "role": session["role"]}

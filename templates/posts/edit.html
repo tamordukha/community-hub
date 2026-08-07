@@ -13,6 +13,8 @@
     <h1>Edit post</h1>
 
     <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        
         <input type="text" name="title" id="title" placeholder="Название поста..." value="{{ post.title }}" required>
 
         <textarea class="post-create-content" name="content" id="content" rows="7" placeholder="Расскажите свою историю...">{{ post.content }}</textarea>

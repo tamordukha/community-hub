@@ -13,8 +13,10 @@
     <h1>Create a post</h1>
 
     <form method="POST">
-        <input type="text" name="title" id="title" placeholder="Название поста..." required>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
+        <input type="text" name="title" id="title" placeholder="Название поста..." required>
+        
         <textarea class="post-create-content" name="content" id="content" rows="7" placeholder="Расскажите свою историю..."></textarea>
 
         <div class="visibility-toggle">

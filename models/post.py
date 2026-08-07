@@ -3,7 +3,7 @@ from database.db import get_connection
 from utils.permissions import can_view_post
 
 
-def get_posts(user=None, profile_user_id=0):
+def get_posts(user=None, profile_user_id=None):
     with get_connection() as conn:
         cursor = conn.cursor()
 

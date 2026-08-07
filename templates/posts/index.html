@@ -53,6 +53,8 @@
 
 
                 <form method="POST" action="{{ url_for('likes.like_post') }}" class="post-footer">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
                     <input type="hidden" name="post_id" value="{{ post.id }}">
                     <input type="hidden" name="redirect_to" value="index">
                     <button type="submit" class="btn-like">
