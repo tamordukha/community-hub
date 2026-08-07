@@ -3,7 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from database.db import get_connection
 
 
-def register_user(username, password):
+def register_user(username, password, role):
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -11,8 +11,8 @@ def register_user(username, password):
 
     try:
         cursor.execute(
-            "INSERT INTO users (username, password) VALUES (?, ?)",
-            (username, hashed_password),
+            "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
+            (username, hashed_password, role),
         )
         conn.commit()
     except sqlite3.IntegrityError:
@@ -69,5 +69,13 @@ def update_user_avatar(user_id, filename):
     cursor = conn.cursor()
 
     cursor.execute("UPDATE users SET avatar = ? WHERE id = ?", (filename, user_id),)
+    conn.commit()
+    conn.close()
+
+def update_user_role(user_id, role):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("UPDATE users SET role = ? WHERE id = ?", (role, user_id),)
     conn.commit()
     conn.close()

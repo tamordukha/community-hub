@@ -1549,12 +1549,6 @@ main {
     background-color: #e0e0e0; /* Серый цвет фона */
 }
 
-.profile-form {
-    margin: 0;
-    padding: 0;
-    border: none;
-}
-
 .profile-avatar {
     width: 100px;
     height: 100px;
@@ -1627,9 +1621,39 @@ main {
     justify-items: center;
 }
 
-
 .profile-username {
     font-size: 25px;
+}
+
+.button-role {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: inline-flex;
+}
+.button-role:hover {
+    background: none;
+}
+
+.user-role-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.profile-form {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+.profile-role-form {
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+    margin-left: 5px;
+    margin: 0;
+    padding: 0;
+    border: none;
 }
 
 .profile-count-posts {
@@ -1643,6 +1667,52 @@ main {
     margin-top: 0px;
     margin-bottom: 0px;
 }
+
+
+/* Выпадающее меню */
+.profile-dropdown-menu {
+    /* Самое главное: absolute позиционирует меню относительно родителя (.post-options), 
+       у которого в вашем коде уже написано position: relative; */
+    position: absolute;
+    
+    /* Сдвигаем меню строго под кнопку */
+    left: 35px;
+    bottom: -20px;
+    /* Прижимаем к правому краю кнопки, чтобы оно аккуратно выпадало вправо-вниз */
+    
+    /* Стили внешнего вида (как карточка) */
+    background-color: #ffffff;
+    min-width: 190px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Мягкая тень */
+    padding: 6px 0;
+    z-index: 100; /* Перекрывает любые элементы и текст под постом */
+    display: none; 
+}
+
+/* ЭТОТ КЛАСС БУДЕТ ДОБАВЛЯТЬ JAVASCRIPT ПРИ КЛИКЕ */
+.profile-dropdown-menu.show {
+    display: block; /* Показывает меню */
+}
+
+/* Стили для ссылок-пунктов внутри меню */
+.profile-dropdown-item {
+    width: 100%;
+    background-color: #ffffff;
+    display: block;
+    padding: 10px 16px;
+    color: #333333;
+    text-decoration: none; /* Убираем нижнее подчеркивание у ссылок */
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+/* Эффект наведения на обычные пункты */
+.profile-dropdown-item:hover {
+    background-color: #f1f3f5;
+}
+
 
 
 /* === СЕТКА И РАСКЛАДКА === */
@@ -1718,6 +1788,7 @@ select {
     padding: 0;
     border: none;
 }
+
 
 /* === КНОПКИ === */
 

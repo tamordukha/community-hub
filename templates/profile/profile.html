@@ -25,8 +25,7 @@
                 </div>
                 <input type="file" name="avatar" class="profile-avatar-input" accept="image/*">
             </div>
-        </form>
-        
+        </form>     
 
     {% else %}
         <img
@@ -36,7 +35,35 @@
     {% endif %}
 
     <div class="profile-info">
-        <span class="profile-username">{{ user.username }}</span>
+        <span class="profile-username">
+            {{ user.username }}
+            {% if can_modify_role(current_user, user) %}
+                <form method="POST" action="{{ url_for('profile.change_role', profile_user_id=user.id) }}" class="profile-role-form">
+                    <button type="button" class="button-role" id="button-role">
+                        <img src="{{ url_for('static', filename='icons/' + user.role + '_icon.png')}}" class="user-role-icon">
+                    </button>
+                    <div class="profile-dropdown-menu" id="profile-dropdown-menu">
+                        {% if can_change_role(current_user, user, "user")%}
+                            <button type="submit" name="new_role" value="user" class="profile-dropdown-item">Понизить до user</button>
+                        {% endif %}
+                        {% if can_change_role(current_user, user, "moderator") %}
+                            <button type="submit" name="new_role" value="moderator" class="profile-dropdown-item">Повысить до moderator</button>
+                        {% endif %}
+                        {% if can_change_role(current_user, user, "admin") %}
+                            <button type="submit" name="new_role" value="admin" class="profile-dropdown-item">Повысить до admin</button>
+                        {% endif %}
+                    </div>
+                </form>
+            {% elif session.role=="moderator" or session.role=="admin" %}
+                <div class="profile-role-form">
+                    <div class="button-role">
+                        <img src="{{ url_for('static', filename='icons/' + user.role + '_icon.png')}}" class="user-role-icon">
+                    </div>
+                </div>
+            {% endif %}
+        </span>
+        
+
         <span class="profile-count-posts"> {{ posts|length }} posts</span>
     </div>
 
@@ -64,6 +91,12 @@
                             {{ post.author_username }}
                         </span>
                     </div>
+
+                    {% if post.is_public == 0 %}
+                        <div class="post-status">
+                            <img src="{{ url_for('static', filename='icons/hide.png') }}" class="post-status-icon">
+                        </div>
+                    {% endif %}
                 </div>
 
                 <div class="post-content">
@@ -103,7 +136,7 @@
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/like.js') }}"></script>
-<script src="{{ url_for('static', filename='js/avatar.js') }}"></script>
+<script src="{{ url_for('static', filename='js/profile.js') }}"></script>
 {% endblock %}
 
 

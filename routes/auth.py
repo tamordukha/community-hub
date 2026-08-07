@@ -15,7 +15,7 @@ def register():
                 "auth/register.html", error="Username and password are required"
             )
 
-        user = register_user(username, password)
+        user = register_user(username, password, "user")
         if user is None:
             return render_template(
                 "auth/register.html", error="Username already exists"
