@@ -5,7 +5,6 @@ from database.db import get_connection
 1) Лайк поста toggle_like_post
 2) Лайк комментария toggle_like_comment
 3) Лайк ответа toggle_like_reply
-4) Подсчет лайков get_likes_count
 '''
 
 def toggle_like_post(post_id, user_id):

@@ -3,8 +3,6 @@ import os
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
-    """Базовая конфигурация."""
-
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-change-in-production")
 
     SQLALCHEMY_DATABASE_URI = os.environ.get(

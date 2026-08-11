@@ -3,7 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from database.db import get_connection
 
 
-def register_user(username, password, role):
+def register_user(username, password):
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -11,12 +11,12 @@ def register_user(username, password, role):
 
     try:
         cursor.execute(
-            "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
-            (username, hashed_password, role),
+            "INSERT INTO users (username, password) VALUES (?, ?)",
+            (username, hashed_password),
         )
         conn.commit()
     except sqlite3.IntegrityError:
-        return "Username already exists", 400
+        return None
     finally:
         conn.close()
 

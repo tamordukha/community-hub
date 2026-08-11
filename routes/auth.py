@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session
-from models.user import register_user, login_user
+from models.user import register_user, login_user, update_user_role
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -15,7 +15,7 @@ def register():
                 "auth/register.html", error="Username and password are required"
             )
 
-        user = register_user(username, password, "user")
+        user = register_user(username, password)
         if user is None:
             return render_template(
                 "auth/register.html", error="Username already exists"
