@@ -119,7 +119,7 @@
                             alt="avatar"
                             class="comment-form-avatar"
                             >
-                            <input class="comment-form-input" type="text"  id="comment-input" name="content" placeholder="Оставить комментарий">
+                            <input class="comment-form-input" type="text"  id="comment-input" name="content" maxlength="500" placeholder="Оставить комментарий">
                         </div>
                         <div class="comment-form-footer">
                             <button type="button" class="btn-comment-form" id="comment-cancel">Отмена</button>
@@ -229,7 +229,7 @@
                                     alt="avatar"
                                     class="comment-form-avatar"
                                     >
-                                    <input class="comment-edit-form-input" type="text" name="content" placeholder="Изменить комментарий" value="{{comment.content}}">
+                                    <input class="comment-edit-form-input" type="text" name="content" maxlength="500" placeholder="Изменить комментарий" value="{{comment.content}}">
                                 </div>
                                 <div class="comment-edit-form-footer">
                                     <button type="button" class="btn-comment-edit-form">Отмена</button>
@@ -247,7 +247,7 @@
                                     alt="avatar"
                                     class="reply-form-avatar"
                                     >
-                                    <input class="reply-form-input" type="text" name="content" id="reply-input" placeholder="Ответить на комментарий">
+                                    <input class="reply-form-input" type="text" name="content" id="reply-input" maxlength="500" placeholder="Ответить на комментарий">
                                 </div>
                                 <div class="reply-form-footer">
                                     <button type="button" class="btn-reply-form">Отмена</button>
@@ -369,7 +369,7 @@
                                                 alt="avatar"
                                                 class="reply-form-avatar"
                                                 >
-                                                <input class="reply-edit-form-input" type="text" name="content" placeholder="Изменить комментарий" value="{{reply.content}}">
+                                                <input class="reply-edit-form-input" type="text" name="content" maxlength="500" placeholder="Изменить комментарий" value="{{reply.content}}">
                                             </div>
                                             <div class="reply-edit-form-footer">
                                                 <button type="button" class="btn-reply-edit-form">Отмена</button>
@@ -387,7 +387,7 @@
                                                 alt="avatar"
                                                 class="reply-to-reply-form-avatar"
                                                 >
-                                                <input class="reply-to-reply-form-input" type="text" name="content" placeholder="Ответить на комментарий {{reply.username}}">
+                                                <input class="reply-to-reply-form-input" type="text" name="content" maxlength="500" placeholder="Ответить на комментарий {{reply.username}}">
                                             </div>
                                             <div class="reply-to-reply-form-footer">
                                                 <button type="button" class="btn-reply-to-reply-form">Отмена</button>

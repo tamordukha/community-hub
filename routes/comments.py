@@ -1,7 +1,8 @@
-from flask import Blueprint, request, redirect, url_for, session, abort
+from flask import Blueprint, request, redirect, url_for, session, abort, flash
 from models.comment import get_comment, add_comment, update_comment, delete_comment, hide_comment
 from models.post import get_post
 from utils.permissions import can_edit_comment, can_delete_comment, can_hide_comment
+from config import Config
 
 comments_bp = Blueprint('comments', __name__)
 
@@ -17,6 +18,9 @@ def create_comment(post_id):
 
     user_id = session["user_id"]
     content = content.strip()
+    if len(content) > Config.COMMENT_MAX_LENGTH:
+        flash(f"Max {Config.COMMENT_MAX_LENGTH} characters", "error")
+        return redirect(url_for("posts.show_post"))
     add_comment(user_id, post_id, content)
     return redirect(url_for("posts.show_post", post_id=post_id))
 
@@ -37,6 +41,9 @@ def edit_comment(post_id, comment_id):
     content = request.form.get("content")
     if content and content.strip():
         content = content.strip()
+        if len(content) > Config.COMMENT_MAX_LENGTH:
+            flash(f"Max {Config.COMMENT_MAX_LENGTH} characters", "error")
+            return redirect(url_for("posts.show_post"))
         update_comment(comment_id, content)
 
     return redirect(url_for("posts.show_post", post_id=post_id))

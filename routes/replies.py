@@ -1,8 +1,9 @@
-from flask import Blueprint, request, redirect, url_for, session, abort
+from flask import Blueprint, request, redirect, url_for, session, abort, flash
 from models.reply import get_reply, add_reply, add_reply_to_reply, update_reply, delete_reply, hide_reply
 from models.post import get_post
 from models.comment import get_comment
 from utils.permissions import can_edit_reply, can_delete_reply, can_hide_reply
+from config import Config
 
 replies_bp = Blueprint('replies', __name__)
 
@@ -17,6 +18,9 @@ def create_reply(post_id, comment_id):
 
     user_id = session["user_id"]
     content = content.strip()
+    if len(content) > Config.COMMENT_MAX_LENGTH:
+        flash(f"Max {Config.COMMENT_MAX_LENGTH} characters", "error")
+        return redirect(url_for("posts.show_post"))
     add_reply(user_id, comment_id, content)
     print(f"Creating reply: user={user_id}, comment={comment_id}, content={content}")
     return redirect(url_for("posts.show_post", post_id=post_id))
@@ -32,6 +36,9 @@ def create_reply_to_reply(post_id, comment_id, parent_reply_id):
 
     user_id = session["user_id"]
     content = content.strip()
+    if len(content) > Config.COMMENT_MAX_LENGTH:
+        flash(f"Max {Config.COMMENT_MAX_LENGTH} characters", "error")
+        return redirect(url_for("posts.show_post"))
     add_reply_to_reply(user_id, comment_id, parent_reply_id, content)
     return redirect(url_for("posts.show_post", post_id=post_id))
 
@@ -52,6 +59,9 @@ def edit_reply(post_id, reply_id):
     content = request.form.get("content")
     if content and content.strip():
         content = content.strip()
+        if len(content) > Config.COMMENT_MAX_LENGTH:
+            flash(f"Max {Config.COMMENT_MAX_LENGTH} characters", "error")
+            return redirect(url_for("posts.show_post"))
         update_reply(reply_id, content)
 
     return redirect(url_for("posts.show_post", post_id=post_id))

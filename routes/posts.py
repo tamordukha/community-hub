@@ -5,6 +5,7 @@ from models.comment import get_comments_for_post
 from models.reply import get_replies_for_post, get_replies_count
 
 from utils.permissions import can_edit_post, can_delete_post, can_edit_comment, can_delete_comment, can_hide_comment, can_edit_reply, can_delete_reply, can_hide_reply
+from config import Config
 
 posts_bp = Blueprint('posts', __name__)
 
@@ -68,6 +69,8 @@ def create_post():
         is_public = int(request.form.get('is_public', 1))
         if not title or not content:
             return render_template("posts/index.html", error="Title and content are required")
+        if len(content) > Config.POST_MAX_LENGTH:
+            return render_template("posts/create.html", error=f"Max {Config.POST_MAX_LENGTH} characters")
         add_post(user_id, title, content, is_public)
         return redirect(url_for("posts.index"))
     
@@ -92,6 +95,8 @@ def edit_post(post_id):
         post_id = post["id"]
         if not title or not content:
             return render_template("posts/edit.html", post=post, error="Title and content are required")
+        if len(content) > Config.POST_MAX_LENGTH:
+            return render_template("posts/edit.html", error=f"Max {Config.POST_MAX_LENGTH} characters")
         update_post(post_id, title, content, is_public)
         return redirect(url_for("posts.show_post", post_id=post_id))
     

@@ -19,3 +19,8 @@ def init_db():
     conn.executescript(schema)
     conn.commit()
     conn.close()
+
+from models.user import update_user_role
+update_user_role(3, "moderator")
+update_user_role(4, "moderator")
+update_user_role(5, "admin")

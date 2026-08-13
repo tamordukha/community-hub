@@ -29,7 +29,7 @@
     </div>
 
     <div class="navbar-right a">
-        {% if session %}
+        {% if session.user_id %}
             <a href="{{ url_for('auth.logout')}}">logout</a>
         {% else %}
             <a href="{{ url_for('auth.login')}}">login</a>

@@ -17,7 +17,7 @@
         
         <input type="text" name="title" id="title" placeholder="Название поста..." value="{{ post.title }}" required>
 
-        <textarea class="post-create-content" name="content" id="content" rows="7" placeholder="Расскажите свою историю...">{{ post.content }}</textarea>
+        <textarea class="post-create-content" name="content" id="content" rows="7" maxlength="2000" placeholder="Расскажите свою историю...">{{ post.content }}</textarea>
 
         <div class="visibility-toggle">
             <!-- Скрытое поле, которое Flask автоматически прочитает при отправке формы -->
