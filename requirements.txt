@@ -1,5 +1,5 @@
 flask
 flask-wtf
-guiicorn
+gunicorn
 pytest
 werkzeug
